@@ -723,6 +723,7 @@ static void OpenRegistryEditor(HWND hDlg, const LangInfo &lang)
 		key += std::wstring(L"\\") + context_menu_name;
 	}
 
+	// regedit が起動時に選択するキーを LastKey に書き込んでおく
 	HKEY hKey;
 	if (RegCreateKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Applets\\Regedit", 0, NULL, 0,
 						KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
@@ -730,8 +731,15 @@ static void OpenRegistryEditor(HWND hDlg, const LangInfo &lang)
 		RegCloseKey(hKey);
 	}
 
-	// /m: 起動済みでも新しいウィンドウを開く (LastKey を反映させるため)
-	const HINSTANCE r = ShellExecuteW(hDlg, L"open", L"regedit.exe", L"/m", NULL, SW_SHOWNORMAL);
+	// regedit 起動
+	//   他に起動してないときは LastKey が反映される
+	//   起動済みのときは既存のウィンドウが前面に出るのみ
+	//   "/m" を付けると多重起動 (multi-instance) になり LastKey が反映されるが、
+	//   ReactOS 0.4.14 の regedit は /m を未定義スイッチとしてエラー終了する
+	//   XP より前の Windows は未確認
+	const wchar_t *option = NULL;	// L"/m";
+	const HINSTANCE r = ShellExecuteW(hDlg, L"open", L"regedit.exe", option,
+									  NULL, SW_SHOWNORMAL);
 	if ((INT_PTR)r <= 32 && (INT_PTR)r != SE_ERR_ACCESSDENIED) {
 		// SE_ERR_ACCESSDENIED は UAC でキャンセルされたとき
 		ShowErrorMessage(hDlg, GetLangStr(lang, "MSG_REGEDIT_ERROR", L"Failed to start the Registry Editor."), GetLastError());
