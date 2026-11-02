@@ -1,4 +1,4 @@
 [ttlaunch.lng]
-charset = utf-8
+charset = utf-8-bom
 trim_trailing_whitespace = true
 insert_final_newline = true
