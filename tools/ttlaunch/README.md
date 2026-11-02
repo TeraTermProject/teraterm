@@ -233,7 +233,30 @@ cygterm は /etc/cygterm.conf, $HOME/.cygtermrc、
 msys2term は /etc/msys2term.conf, $HOME/.msys2termrc を読み込みます。
 $HOME は Windows の環境変数 HOME が設定されていればその値、無い場合は `db_home` などで決まります。
 
-## MSYS2 の環境変数 MSYSTEM
+## 環境変数
+
+### CHERE_INVOKING
+
+`-d` を指定したとき、Cygwin, MSYS2, Git Bash の shell には
+cygterm または msys2term の `-v` オプションで環境変数 `CHERE_INVOKING=y` を設定します。
+
+cygterm, msys2term も、`-d` が指定されていて、ログインシェルとして起動するとき
+(設定ファイルの `LOGIN_SHELL = Yes`)は、`CHERE_INVOKING=y` を設定します。
+通常の設定では ttlaunch の `-v` オプションと重複しますが、
+ttlaunch の指定は `LOGIN_SHELL` の設定にかかわらず有効です。
+
+環境変数 `CHERE_INVOKING` は Cygwin の chere パッケージ
+(エクスプローラーのコンテキストメニューに "Bash Prompt Here" などを追加するパッケージ)
+由来の環境変数です。
+
+Cygwin, MSYS2 の /etc/profile はログインシェルとして起動したときに
+ホームディレクトリへ移動しますが、
+環境変数 `CHERE_INVOKING` が設定されているときは移動しません。
+これにより、`-d` で指定したフォルダで shell が開始します。
+
+WSL と Windows の shell(cmd, PowerShell) には設定しません。
+
+### MSYSTEM
 
 MSYS2 の各環境は、msys2term の `-v` オプションで環境変数 `MSYSTEM` を設定して起動します。
 MSYS2 の /etc/profile は `MSYSTEM` の値によって PATH などを設定し、各環境の shell になります。
@@ -290,27 +313,6 @@ cygterm, msys2term のどちらを使うかは、Cygwin, MSYS2, Git for Windows 
 ```
 cygterm -nols -s "C:/Windows/system32/wsl.exe -d 'Ubuntu-24.04'"
 ```
-
-## CHERE_INVOKING
-
-`-d` を指定したとき、Cygwin, MSYS2, Git Bash の shell には
-cygterm または msys2term の `-v` オプションで環境変数 `CHERE_INVOKING=y` を設定します。
-
-cygterm, msys2term も、`-d` が指定されていて、ログインシェルとして起動するとき
-(設定ファイルの `LOGIN_SHELL = Yes`)は、`CHERE_INVOKING=y` を設定します。
-通常の設定では ttlaunch の `-v` オプションと重複しますが、
-ttlaunch の指定は `LOGIN_SHELL` の設定にかかわらず有効です。
-
-環境変数 `CHERE_INVOKING` は Cygwin の chere パッケージ
-(エクスプローラーのコンテキストメニューに "Bash Prompt Here" などを追加するパッケージ)
-由来の環境変数です。
-
-Cygwin, MSYS2 の /etc/profile はログインシェルとして起動したときに
-ホームディレクトリへ移動しますが、
-環境変数 `CHERE_INVOKING` が設定されているときは移動しません。
-これにより、`-d` で指定したフォルダで shell が開始します。
-
-WSL と Windows の shell(cmd, PowerShell) には設定しません。
 
 ## エクスプローラーのコンテキストメニュー
 
@@ -391,4 +393,7 @@ ttlaunch.lng は言語ごとのセクション(`[English]`, `[Japanese]` など)
 Tera Term の設定(TERATERM.INI の UILanguageFile)で選ばれている言語のセクションを使用します
 (言語名は Tera Term の lng ファイルの `[Info]` の `language=` の括弧より前の部分です)。
 セクションやキーが無いときは英語になります。
+
 ソースの ttlaunch.lng は UTF-8 で、ビルド時に UTF-16LE に変換して配置します。
+[Win32 API iniファイル](https://teratermproject.github.io/manual/5/ja/reference/dev/win32api.html#ini_file)を参照してください。
+
