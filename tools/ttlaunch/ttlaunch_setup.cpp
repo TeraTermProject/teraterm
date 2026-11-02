@@ -60,8 +60,15 @@
 #define BCM_SETSHIELD	0x160c
 #endif
 
-//#define	HERE_LABEL	L"Tera Term &Here";
-#define	HERE_LABEL	L"&Open in Tera Term";
+/**
+ *	コンテキストメニューの親項目 ("Open in Tera Term") の既定の文言
+ *		設定ダイアログで変更でき、登録時にレジストリに書く
+ *		文言ファイルの MENU_HERE、無いときは英語
+ */
+static std::wstring GetDefaultHereLabel(const LangInfo &lang)
+{
+	return GetLangStr(lang, "MENU_HERE", L"&Open in Tera Term");
+}
 
 /**
  *	エクスプローラーのコンテキストメニューのレジストリキー
@@ -83,9 +90,9 @@ static const wchar_t *context_menu_name = L"ttlaunch";	// キー名, 直接登�
  *	コンテキストメニューの種類
  */
 typedef enum {
-	MENU_TYPE_POPUP,		// "Open in Tera Term" 1 項目, 選択すると ttlaunch のポップアップメニューを表示する
+	MENU_TYPE_POPUP,		// 親項目 1 つ, 選択すると ttlaunch のポップアップメニューを表示する
 	MENU_TYPE_ITEMS,		// 各 shell をコンテキストメニューの項目として直接登録する (サブメニューなし, 古い Windows でも使える)
-	MENU_TYPE_SUBMENU,		// "Open in Tera Term" のサブメニューに各 shell を並べる (Windows 7 以降)
+	MENU_TYPE_SUBMENU,		// 親項目のサブメニューに各 shell を並べる (Windows 7 以降)
 } menu_type_t;
 
 /**
@@ -96,6 +103,7 @@ struct ContextMenuStatus {
 	bool current_user;		// HKEY_CURRENT_USER に登録されている (一部のキーだけでも true)
 	bool local_machine;		// HKEY_LOCAL_MACHINE に登録されている (この設定ダイアログでは変更できない)
 	menu_type_t type;		// 登録されているメニューの種類 (registered のとき有効)
+	std::wstring label;		// 登録されている親項目の文言 (POPUP, SUBMENU のとき, 無いときは "")
 };
 
 static bool RegKeyExists(HKEY root, const std::wstring &key)
@@ -117,6 +125,42 @@ static bool RegValueExists(HKEY root, const std::wstring &key, const wchar_t *na
 	const LSTATUS r = RegQueryValueExW(hKey, name, NULL, NULL, NULL, NULL);
 	RegCloseKey(hKey);
 	return r == ERROR_SUCCESS;
+}
+
+/**
+ *	文字列値を読む
+ *	@param	name	値の名前, "" は既定値
+ *	@param	value	読めたとき文字列を格納する
+ *	@return	読めたとき true
+ */
+static bool RegReadString(HKEY root, const std::wstring &key,
+						  const wchar_t *name, std::wstring &value)
+{
+	HKEY hKey;
+	if (RegOpenKeyExW(root, key.c_str(), 0, KEY_READ, &hKey)
+		!= ERROR_SUCCESS) {
+		return false;
+	}
+	DWORD type = 0;
+	DWORD size = 0;
+	void *data;
+	const LSTATUS r =
+		hRegQueryValueExW(hKey, name, NULL, &type, &data, &size);
+	RegCloseKey(hKey);
+	if (r != ERROR_SUCCESS) {
+		return false;
+	}
+	const bool is_string = type == REG_SZ || type == REG_EXPAND_SZ;
+	if (is_string) {
+		// 終端の NUL は含まれないことがある
+		value.assign((const wchar_t *)data, size / sizeof(wchar_t));
+		const size_t end = value.find(L'\0');
+		if (end != std::wstring::npos) {
+			value.resize(end);
+		}
+	}
+	free(data);
+	return is_string;
 }
 
 /**
@@ -150,7 +194,11 @@ static std::vector<std::wstring> EnumContextMenuKeys(HKEY root, const std::wstri
 
 static ContextMenuStatus GetContextMenuStatus(void)
 {
-	ContextMenuStatus st = { true, false, false, MENU_TYPE_POPUP };
+	ContextMenuStatus st;
+	st.registered = true;
+	st.current_user = false;
+	st.local_machine = false;
+	st.type = MENU_TYPE_POPUP;
 	for (size_t i = 0; i < _countof(context_menu_keys); i++) {
 		const std::wstring parent = context_menu_keys[i].parent;
 		if (EnumContextMenuKeys(HKEY_CLASSES_ROOT, parent).empty()) {
@@ -170,9 +218,11 @@ static ContextMenuStatus GetContextMenuStatus(void)
 		}
 		else if (RegValueExists(HKEY_CLASSES_ROOT, base, L"SubCommands")) {
 			st.type = MENU_TYPE_SUBMENU;
+			RegReadString(HKEY_CLASSES_ROOT, base, L"MUIVerb", st.label);
 		}
 		else {
 			st.type = MENU_TYPE_POPUP;
+			RegReadString(HKEY_CLASSES_ROOT, base, L"", st.label);
 		}
 	}
 	return st;
@@ -285,8 +335,13 @@ static std::vector<RegEntry> CreateUnregisterEntries(void)
  *
  *	@param	items	起動方法の一覧 (MENU_TYPE_ITEMS, MENU_TYPE_SUBMENU のとき各項目になる)
  *	@param	type	メニューの種類
+ *	@param	parent_label
+ *					親項目の文言 (MENU_TYPE_POPUP, MENU_TYPE_SUBMENU で使用)
+ *					空のとき既定の文言
  */
-static std::vector<RegEntry> CreateRegisterEntries(const std::vector<LaunchItem> &items, menu_type_t type)
+static std::vector<RegEntry> CreateRegisterEntries(
+	const std::vector<LaunchItem> &items, menu_type_t type,
+	const std::wstring &parent_label)
 {
 	const LangInfo &lang = GetLangInfo();
 
@@ -301,7 +356,8 @@ static std::vector<RegEntry> CreateRegisterEntries(const std::vector<LaunchItem>
 	const std::wstring sysnative = std::wstring(windir) + L"\\Sysnative\\";
 	const std::wstring system32 = std::wstring(windir) + L"\\System32\\";
 
-	const std::wstring here_label = HERE_LABEL;
+	const std::wstring here_label =
+		parent_label.empty() ? GetDefaultHereLabel(lang) : parent_label;
 	const std::wstring setup_label = GetLangStr(lang, "MENU_SETUP", L"Open &settings dialog...");
 
 	std::vector<RegEntry> entries = CreateUnregisterEntries();
@@ -613,6 +669,11 @@ static void UpdateSetupDialog(HWND hDlg, const LangInfo &lang)
 	SetDlgItemTextW(hDlg, IDC_REGISTER, register_label.c_str());
 	SetDlgItemTextW(hDlg, IDC_UNREGISTER, unregister_label.c_str());
 	EnableWindow(GetDlgItem(hDlg, IDC_UNREGISTER), regfile || st.current_user);
+
+	// 親項目の文言は項目を直接登録では使わない
+	const bool use_label = GetSelectedMenuType(hDlg) != MENU_TYPE_ITEMS;
+	EnableWindow(GetDlgItem(hDlg, IDC_LABEL_LABEL), use_label);
+	EnableWindow(GetDlgItem(hDlg, IDC_LABEL), use_label);
 }
 
 /**
@@ -686,6 +747,7 @@ static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 		{ IDC_TYPE_POPUP, "DLG_SETUP_TYPE_POPUP" },
 		{ IDC_TYPE_ITEMS, "DLG_SETUP_TYPE_ITEMS" },
 		{ IDC_TYPE_SUBMENU, "DLG_SETUP_TYPE_SUBMENU" },
+		{ IDC_LABEL_LABEL, "DLG_SETUP_LABEL" },
 		{ IDC_ITEMS_LABEL, "DLG_SETUP_ITEMS" },
 		{ IDC_OUT_LABEL, "DLG_SETUP_OUT_LABEL" },
 		{ IDC_OUT_REGISTRY, "DLG_SETUP_OUT_REGISTRY" },
@@ -730,6 +792,11 @@ static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 			type == MENU_TYPE_ITEMS ? IDC_TYPE_ITEMS : IDC_TYPE_POPUP;
 		CheckRadioButton(hDlg, IDC_TYPE_POPUP, IDC_TYPE_SUBMENU, type_id);
 
+		// 親項目の文言: 登録済みならその文言、無ければ既定の文言
+		const std::wstring label =
+			!st.label.empty() ? st.label : GetDefaultHereLabel(data->lang);
+		SetDlgItemTextW(hDlg, IDC_LABEL, label.c_str());
+
 		// 出力先: レジストリ
 		CheckRadioButton(hDlg, IDC_OUT_REGISTRY, IDC_OUT_REGFILE, IDC_OUT_REGISTRY);
 
@@ -757,12 +824,25 @@ static INT_PTR CALLBACK SetupDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 		const SetupDialogData *data = (const SetupDialogData *)GetWindowLongPtrW(hDlg, DWLP_USER);
 		const LangInfo &lang = data->lang;
 		switch (LOWORD(wParam)) {
+		case IDC_TYPE_POPUP:
+		case IDC_TYPE_ITEMS:
+		case IDC_TYPE_SUBMENU:
 		case IDC_OUT_REGISTRY:
 		case IDC_OUT_REGFILE:
 			UpdateSetupDialog(hDlg, lang);
 			return TRUE;
 		case IDC_REGISTER: {
-			const std::vector<RegEntry> entries = CreateRegisterEntries(*data->items, GetSelectedMenuType(hDlg));
+			wchar_t *label_text;
+			hGetDlgItemTextW(hDlg, IDC_LABEL, &label_text);
+			const std::wstring label = label_text != NULL ? label_text : L"";
+			free(label_text);
+			if (label.empty()) {
+				// 空のときは既定の文言で登録する, 入力欄にも戻す
+				SetDlgItemTextW(hDlg, IDC_LABEL,
+								GetDefaultHereLabel(lang).c_str());
+			}
+			const std::vector<RegEntry> entries = CreateRegisterEntries(
+				*data->items, GetSelectedMenuType(hDlg), label);
 			if (IsRegFileSelected(hDlg)) {
 				SaveRegFile(hDlg, lang, L"ttlaunch_context_menu.reg", RegEntriesToText(entries));
 				return TRUE;
