@@ -109,7 +109,8 @@ typedef struct {
  *	@param	port_no			ポート番号 "com%d", -1のとき使用しない
  *	@param	port_name		port_name ポート名
  */
-static void serial_dlg_set_comport_info(HWND dlg, SerialDlgData *dlg_data, int port_index, int port_no, const wchar_t *port_name)
+static void serial_dlg_set_comport_info(HWND dlg, const SerialDlgData *dlg_data,
+										int port_index, int port_no, const wchar_t *port_name)
 {
 	const wchar_t *text = L"This port does not exist now.";
 	if (port_index != -1) {
@@ -145,7 +146,7 @@ static void serial_dlg_set_comport_info(HWND dlg, SerialDlgData *dlg_data, int p
  *   IDC_CONFIG_BUTTON=デバイスマネージャプロパティボタン
  */
 static void serial_dlg_update_port_sel(HWND dlg, int id,
-									   SerialDlgData *dlg_data)
+									   const SerialDlgData *dlg_data)
 {
 	LRESULT sel = SendDlgItemMessageA(dlg, id, CB_GETCURSEL, 0, 0);
 	int item_data = -1;
@@ -218,9 +219,9 @@ static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, 
  *		-2		"存在するポートのみ表示"
  *		-3		"全てのポートを表示"
  */
-static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
+static void SetPortDrop(HWND hWnd, int id, const SerialDlgData *dlg_data)
 {
-	PTTSet ts = dlg_data->pts;
+	const TTTSet *ts = dlg_data->pts;
 	BOOL show_all_port = dlg_data->show_all_port;
 	int max_com = ts->MaxComPort;
 	if (max_com < ts->ComPort) {
