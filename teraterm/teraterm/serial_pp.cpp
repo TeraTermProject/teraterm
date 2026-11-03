@@ -298,7 +298,7 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 	if (dlg_data->ComPortInfoCount == 0) {
 		// COMポートなし
 		serial_dlg_set_comport_info(hWnd, dlg_data, -1, -1, NULL);
-		EnableWindow(GetDlgItem(hWnd, IDC_BUTTON_CONFIG), FALSE);
+		EnableWindow(GetDlgItem(hWnd, IDC_CONFIG_BUTTON), FALSE);
 	}
 	else {
 		TComVar* cv = dlg_data->pcv;
@@ -307,7 +307,7 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 			EnableWindow(GetDlgItem(hWnd, id), FALSE);
 		}
 		serial_dlg_set_comport_info(hWnd, dlg_data, -1, ts->ComPort, NULL);
-		EnableWindow(GetDlgItem(hWnd, IDC_BUTTON_CONFIG), FALSE);
+		EnableWindow(GetDlgItem(hWnd, IDC_CONFIG_BUTTON), FALSE);
 	}
 	SendDlgItemMessage(hWnd, id, CB_SETCURSEL, sel_index - 1, 0);  // sel_index = 1 origin
 }
@@ -607,7 +607,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 
 			CheckDlgButton(Dialog, IDC_CONFIG_CHECKBOX, BST_CHECKED);
 			if (!IsProcessElevated()) {
-				SendDlgItemMessage(Dialog, IDC_BUTTON_CONFIG, BCM_SETSHIELD, 0, TRUE);
+				SendDlgItemMessage(Dialog, IDC_CONFIG_BUTTON, BCM_SETSHIELD, 0, TRUE);
 			}
 
 			dlg_data->timer_id = SetTimer(Dialog, 0, 100, ComPortStatusUpdateProc);
@@ -744,12 +744,12 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						if (item_data >= 0) {
 							// 詳細情報を表示する
 							serial_dlg_set_comport_info(Dialog, dlg_data, item_data, -1, NULL);
-							EnableWindow(GetDlgItem(Dialog, IDC_BUTTON_CONFIG), TRUE);
+							EnableWindow(GetDlgItem(Dialog, IDC_CONFIG_BUTTON), TRUE);
 						}
 						else if (item_data == -1) {
 							// 情報なしを表示する
 							serial_dlg_set_comport_info(Dialog, dlg_data, -1, -1, NULL);
-							EnableWindow(GetDlgItem(Dialog, IDC_BUTTON_CONFIG), FALSE);
+							EnableWindow(GetDlgItem(Dialog, IDC_CONFIG_BUTTON), FALSE);
 						}
 						else {
 							// 選択方法変更
@@ -826,7 +826,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					}
 					return TRUE;
 
-				case IDC_BUTTON_CONFIG:
+				case IDC_CONFIG_BUTTON:
 					if (HIWORD(wParam) == BN_CLICKED) {
 						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 						LRESULT sel = SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
@@ -851,7 +851,7 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 					if (HIWORD(wParam) == BN_CLICKED) {
 						if (!IsProcessElevated()) {
 							BOOL shield = IsDlgButtonChecked(Dialog, IDC_CONFIG_CHECKBOX);
-							SendDlgItemMessageW(Dialog, IDC_BUTTON_CONFIG, BCM_SETSHIELD, 0, shield);
+							SendDlgItemMessageW(Dialog, IDC_CONFIG_BUTTON, BCM_SETSHIELD, 0, shield);
 						}
 						return TRUE;
 					}
