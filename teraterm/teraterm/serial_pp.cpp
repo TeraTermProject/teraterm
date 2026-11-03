@@ -140,6 +140,33 @@ static void serial_dlg_set_comport_info(HWND dlg, SerialDlgData *dlg_data, int p
 }
 
 /*
+ * ポートドロップダウンで選択中の項目に合わせて
+ * 詳細情報と IDC_CONFIG_BUTTON の有効/無効を更新する
+ *   IDC_CONFIG_BUTTON=デバイスマネージャプロパティボタン
+ */
+static void serial_dlg_update_port_sel(HWND dlg, int id,
+									   SerialDlgData *dlg_data)
+{
+	LRESULT sel = SendDlgItemMessageA(dlg, id, CB_GETCURSEL, 0, 0);
+	int item_data = -1;
+	if (sel != CB_ERR) {
+		item_data = (int)SendDlgItemMessageA(dlg, id, CB_GETITEMDATA, sel, 0);
+	}
+	if (item_data >= 0) {
+		// 存在するポート、詳細情報を表示する
+		serial_dlg_set_comport_info(dlg, dlg_data, item_data, -1, NULL);
+		// デバイスマネージャプロパティボタン
+		EnableWindow(GetDlgItem(dlg, IDC_CONFIG_BUTTON), TRUE);
+	}
+	else {
+		// 存在しないポート、情報なしを表示する
+		serial_dlg_set_comport_info(dlg, dlg_data, -1, -1, NULL);
+		// デバイスマネージャプロパティボタン
+		EnableWindow(GetDlgItem(dlg, IDC_CONFIG_BUTTON), FALSE);
+	}
+}
+
+/*
  * シリアルポート設定ダイアログのテキストボックスのプロシージャ
  */
 static LRESULT CALLBACK SerialDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -295,21 +322,19 @@ static void SetPortDrop(HWND hWnd, int id, SerialDlgData *dlg_data)
 	}
 
 	ExpandCBWidth(hWnd, id);
-	if (dlg_data->ComPortInfoCount == 0) {
-		// COMポートなし
-		serial_dlg_set_comport_info(hWnd, dlg_data, -1, -1, NULL);
-		EnableWindow(GetDlgItem(hWnd, IDC_CONFIG_BUTTON), FALSE);
-	}
-	else {
+	if (dlg_data->ComPortInfoCount != 0) {
 		TComVar* cv = dlg_data->pcv;
 		if (cv->Open && (cv->PortType == IdSerial)) {
 			// 接続中の時は選択できないようにする
 			EnableWindow(GetDlgItem(hWnd, id), FALSE);
 		}
-		serial_dlg_set_comport_info(hWnd, dlg_data, -1, ts->ComPort, NULL);
-		EnableWindow(GetDlgItem(hWnd, IDC_CONFIG_BUTTON), FALSE);
+	}
+	if (sel_index == 0) {
+		// ts->ComPort に一致する項目がない(ComPort が 0 など)ときは先頭を選択する
+		sel_index = 1;
 	}
 	SendDlgItemMessage(hWnd, id, CB_SETCURSEL, sel_index - 1, 0);  // sel_index = 1 origin
+	serial_dlg_update_port_sel(hWnd, id, dlg_data);
 }
 
 #define CommXonLim 2048
@@ -741,15 +766,9 @@ static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 						SerialDlgData *dlg_data = (SerialDlgData *)GetWindowLongPtrW(Dialog, DWLP_USER);
 						LRESULT sel = SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETCURSEL, 0, 0);
 						int item_data = (int)SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_GETITEMDATA, sel, 0);
-						if (item_data >= 0) {
-							// 詳細情報を表示する
-							serial_dlg_set_comport_info(Dialog, dlg_data, item_data, -1, NULL);
-							EnableWindow(GetDlgItem(Dialog, IDC_CONFIG_BUTTON), TRUE);
-						}
-						else if (item_data == -1) {
-							// 情報なしを表示する
-							serial_dlg_set_comport_info(Dialog, dlg_data, -1, -1, NULL);
-							EnableWindow(GetDlgItem(Dialog, IDC_CONFIG_BUTTON), FALSE);
+						if (item_data >= -1) {
+							// 詳細情報と Config ボタンを更新する
+							serial_dlg_update_port_sel(Dialog, IDC_SERIALPORT, dlg_data);
 						}
 						else {
 							// 選択方法変更
