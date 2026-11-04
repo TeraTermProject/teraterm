@@ -16,6 +16,7 @@ RUN \
 		gcc-mingw-w64-i686-win32 \
 		g++-mingw-w64-i686-win32 \
 		fp-utils \
+		xorriso \
 		git nasm
 
 # locale

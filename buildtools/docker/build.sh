@@ -22,4 +22,5 @@ cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake -DA
 make -j $(nproc)
 make -j install
 bash make_installer_cmake.sh
-cp *.zip /mnt/
+cp *.zip* /mnt/
+cp *.iso* /mnt/
