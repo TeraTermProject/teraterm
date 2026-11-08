@@ -49,6 +49,7 @@ public:
 		wchar_t *FullName;
 		wchar_t *FileName;		// NULLのとき、FullNameからファイル名を作成する
 		BOOL HideDialog;
+		BOOL LogShowDialog;
 		HWND HMainWin;
 	};
 
@@ -73,6 +74,7 @@ private:
 	WORD OpId;
 	int ProgStat;	// プログレスバーの進捗が戻らないよう記憶しておく
 	BOOL HideDialog;
+	BOOL LogShowDialog;
 	wchar_t *DlgCaption;
 	wchar_t *FileName;
 	wchar_t *FullName;

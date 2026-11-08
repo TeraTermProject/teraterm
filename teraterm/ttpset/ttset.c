@@ -990,6 +990,9 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Log without transfer dialog */
 	ts->LogHideDialog = GetOnOff(Section, "LogHideDialog", FName, FALSE);
 
+	/* Show logging dialog */
+	ts->LogShowDialog = GetOnOff(Section, "LogShowDialog", FName, FALSE);
+
 	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogIncludeScreenBuffer", FName, FALSE);
 
 	/* Timestamp format of Log each line */
@@ -2540,6 +2543,9 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 
 	/* Log without transfer dialog */
 	WriteOnOff(Section, "LogHideDialog", FName, ts->LogHideDialog);
+
+	/* Show logging dialog */
+	WriteOnOff(Section, "LogShowDialog", FName, ts->LogShowDialog);
 
 	WriteOnOff(Section, "LogIncludeScreenBuffer", FName, ts->LogAllBuffIncludedInFirst);
 

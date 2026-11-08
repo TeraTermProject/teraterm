@@ -18,7 +18,7 @@ Tera Term のログを開始する。
 </p>
 
 <pre class="macro-syntax">
-logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;include screen buffer flag&gt; [&lt;timestamp type&gt;]]]]]
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;include screen buffer flag&gt; [&lt;timestamp type&gt; [&lt;show dialog flag&gt;]]]]]]
 </pre>
 
 <h2>解説</h2>
@@ -50,7 +50,7 @@ logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text
 </p>
 
 <p>
-&lt;hide dialog flag&gt; が 0 以外の場合、ログ転送のダイアログを表示しない。
+&lt;hide dialog flag&gt; が 0 以外の場合、"Logging" ダイアログボックスを表示しない。
 </p>
 
 <p>
@@ -87,6 +87,23 @@ logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text
     <td>経過時間 (Connection)</td>
   </tr>
 </table>
+
+<p>
+&lt;show dialog flag&gt; が 0 以外の場合、"Logging" ダイアログボックスを表示する。 <em>(バージョン 5.8.0 以降)</em><br>
+&lt;hide dialog flag&gt; が 0 以外の場合、&lt;show dialog flag&gt; の指定は無視される。<br>
+&lt;hide dialog flag&gt; との関係は以下のとおり。
+<table>
+  <tr>
+    <th>&lt;hide dialog flag&gt;</th>
+    <th>&lt;show dialog flag&gt;</th>
+    <th>"Logging" ダイアログボックス</th>
+  </tr>
+  <tr> <td>0以外</td> <td>0以外</td> <td>非表示</td> </tr>
+  <tr> <td>0以外</td> <td>0</td>     <td>非表示</td> </tr>
+  <tr> <td>0</td>     <td>0以外</td> <td>表示</td>   </tr>
+  <tr> <td>0</td>     <td>0</td>     <td>最小化</td> </tr>
+</table>
+</p>
 
 <p>
 ログファイルを開けた場合、result に 0 が格納される。開けなかった場合は 1 が格納される。<em>(バージョン 4.62 以降)</em>
@@ -153,6 +170,7 @@ return
   <li><a href="logclose.html">logclose</a></li>
   <li><a href="statusbox.html">statusbox</a></li>
   <li><a href="gettime.html">gettime</a></li>
+  <li><a href="loginfo.html">loginfo</a></li>
 </ul>
 
 </body>

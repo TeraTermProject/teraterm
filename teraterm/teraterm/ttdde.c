@@ -556,6 +556,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		ts.LogHideDialog    = Command[LogOptHideDialog] - 0x30;
 		ts.LogAllBuffIncludedInFirst = Command[LogOptIncScrBuff] - 0x30;
 		ts.LogTimestampType = Command[LogOptTimestampType] - 0x30;
+		ts.LogShowDialog    = Command[LogOptShowDialog] - 0x30;
 		break;
 	case CmdSetXmodemOpt:
 		ParamXmodemOpt = Command[1] & 3;

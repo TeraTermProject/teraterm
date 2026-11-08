@@ -3322,6 +3322,11 @@ static WORD TTLLogOpen(void)
 		return ErrSyntax;
 	LogFlags[LogOptTimestampType] = TmpFlag;
 
+	// show logging dialog
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetIntVal(&LogFlags[LogOptShowDialog], &Err);
+	if (Err!=0) return Err;
+
 EndLogOptions:
 	if (strlen(Str) == 0 || GetFirstChar() != 0)
 		return ErrSyntax;

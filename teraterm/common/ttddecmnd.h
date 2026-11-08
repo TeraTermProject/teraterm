@@ -104,4 +104,5 @@
 #define LogOptHideDialog    5
 #define LogOptIncScrBuff    6
 #define LogOptTimestampType 7
-#define LogOptMax           LogOptTimestampType
+#define LogOptShowDialog    8
+#define LogOptMax           LogOptShowDialog
