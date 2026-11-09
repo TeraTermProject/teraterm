@@ -20,6 +20,14 @@ add_library(
   ../../libs/argon2/src/thread.h
   )
 
+if(MSVC)
+  target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    _CRT_SECURE_NO_DEPRECATE
+  )
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS_EQUAL 1500))
   # Visual Studio 2005, 2008  (1500=VS2008)
   target_sources(

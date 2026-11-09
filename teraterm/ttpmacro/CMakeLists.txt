@@ -52,6 +52,14 @@ add_executable(
   ttmacro_manifest.rc
   )
 
+if(MSVC)
+  target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    _CRT_SECURE_NO_DEPRECATE
+  )
+endif()
+
 if(SUPPORT_OLD_WINDOWS)
   if(MSVC)
     target_sources(

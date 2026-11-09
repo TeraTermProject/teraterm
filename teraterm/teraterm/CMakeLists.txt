@@ -329,6 +329,14 @@ source_group(
   REGULAR_EXPRESSION
   "..\/ttptek\/")
 
+if(MSVC)
+  target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    _CRT_SECURE_NO_DEPRECATE
+  )
+endif()
+
 if(SUPPORT_OLD_WINDOWS)
   target_compile_definitions(
     ${PROJECT_NAME}

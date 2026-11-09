@@ -8,6 +8,14 @@ add_executable(
   test.c
   )
 
+if(MSVC)
+  target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    _CRT_SECURE_NO_DEPRECATE
+  )
+endif()
+
 if(SUPPORT_OLD_WINDOWS)
   target_link_libraries(
     ${PROJECT_NAME}
