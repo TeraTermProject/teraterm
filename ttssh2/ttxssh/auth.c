@@ -206,7 +206,7 @@ static void init_auth_machine_banner(PTInstVar pvar, HWND dlg)
 	wchar_t* buf;
 	wchar_t buf2[1024];
 	const char *host_name = SSH_get_host_name(pvar);
-	wchar_t *host_nameW = ToWcharA(host_name);
+	wchar_t *host_nameW = ToWcharU8(host_name);
 
 	GetDlgItemTextW(dlg, IDC_SSHAUTHBANNER, buf2, _countof(buf2));
 	aswprintf(&buf, buf2, host_nameW);

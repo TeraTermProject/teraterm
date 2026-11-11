@@ -58,9 +58,17 @@
       </li>
       <li>
         Changed the connection host name to be handled in Unicode, and supported connecting to hosts with Internationalized Domain Names (IDN).
-        (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
-        Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".<br>
-        The host name is held in Unicode and converted to Punycode (ACE form) for the DNS query.
+        <ul>
+          <li>
+            The host name is held in Unicode and converted to Punycode (ACE form) for the DNS query.
+            (<a href="https://github.com/TeraTermProject/teraterm/issues/1493" target="_blank">issue #1493</a>)<br>
+            Previously it was held as an ANSI string, and characters that could not be converted were replaced with "?".
+          </li>
+          <li>
+            Changed the character encoding of ssh_known_hosts from ANSI to UTF-8 (the host name is handled in UTF-8).
+            (<a href="https://github.com/TeraTermProject/teraterm/issues/1601" target="_blank">issue #1601</a>)
+          </li>
+        </ul>
       </li>
       <li>
         Added PWSAAsyncGetAddrInfoW, which receives the host name and port name in UTF-16, to the plug-in (TTX) socket hooks TTXSockHooks.
