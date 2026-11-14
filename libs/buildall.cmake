@@ -42,46 +42,39 @@ set(ARCHITECTURE_OPTION -DARCHITECTURE=${ARCHITECTURE})
 include(${CMAKE_CURRENT_LIST_DIR}/../buildtools/checkperl.cmake)
 message("perl=${PERL}")
 
+# ライブラリを1つビルドする, 失敗したら停止する
+#   NAME    表示用のライブラリ名
+#   ARGN    cmake に渡す引数
+function(build_library NAME)
+  message("${NAME}")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} ${ARGN}
+    RESULT_VARIABLE rv
+    )
+  if(NOT rv STREQUAL "0")
+    message(FATAL_ERROR "${NAME} build fail ${rv}")
+  endif()
+endfunction()
+
+set(GENERATOR_OPTION
+  -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION})
+
 # build
-message("oniguruma")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildoniguruma.cmake
-  )
-message("zlib")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildzlib.cmake
-  )
-message("SFMT")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildsfmt.cmake
-  )
+build_library("oniguruma" ${GENERATOR_OPTION} -P buildoniguruma.cmake)
+build_library("zlib" ${GENERATOR_OPTION} -P buildzlib.cmake)
+build_library("SFMT" ${GENERATOR_OPTION} -P buildsfmt.cmake)
 if(BUILD_SSL_LIBRARY)
   if(BUILD_OPENSSL1)
-    message("openssl 1.1")
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl11.cmake
-    )
+    build_library("openssl 1.1" ${GENERATOR_OPTION} -P openssl11.cmake)
   endif(BUILD_OPENSSL1)
   if(BUILD_OPENSSL3)
-    message("openssl 3")
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P openssl3.cmake
-    )
+    build_library("openssl 3" ${GENERATOR_OPTION} -P openssl3.cmake)
   endif(BUILD_OPENSSL3)
 endif(BUILD_SSL_LIBRARY)
-message("cJSON")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -P buildcjson.cmake
-  )
-message("argon2")
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -P buildargon2.cmake
-  )
+build_library("cJSON" -P buildcjson.cmake)
+build_library("argon2" -P buildargon2.cmake)
 if(BUILD_SSL_LIBRARY)
-  message("libressl")
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} ${ARCHITECTURE_OPTION} -P buildlibressl.cmake
-    )
+  build_library("libressl" ${GENERATOR_OPTION} -P buildlibressl.cmake)
 endif(BUILD_SSL_LIBRARY)
 
 message("done buildall.cmake")
