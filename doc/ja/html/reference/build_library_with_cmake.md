@@ -35,17 +35,20 @@
 
 libs/buildall_cmake.bat を実行して使用する Visual Studioを選ぶ
 
-    1. Visual Studio 17 2022 Win32
-    2. Visual Studio 17 2022 x64
-    3. Visual Studio 17 2022 ARM64
-    4. Visual Studio 16 2019 Win32
-    5. Visual Studio 16 2019 x64
-    6. Visual Studio 15 2017
-    7. Visual Studio 14 2015
-    8. Visual Studio 12 2013
-    9. Visual Studio 11 2012
-    a. Visual Studio 10 2010
-    b. Visual Studio 9 2008
+    1. Visual Studio 18 2026 Win32
+    2. Visual Studio 18 2026 x64
+    3. Visual Studio 18 2026 ARM64
+    4. Visual Studio 17 2022 Win32
+    5. Visual Studio 17 2022 x64
+    6. Visual Studio 17 2022 ARM64
+    7. Visual Studio 16 2019 Win32
+    8. Visual Studio 16 2019 x64
+    9. Visual Studio 15 2017
+    a. Visual Studio 14 2015
+    b. Visual Studio 12 2013
+    c. Visual Studio 11 2012
+    d. Visual Studio 10 2010
+    e. Visual Studio 9 2008
     select no
 
 ### cmakeを使用する場合
