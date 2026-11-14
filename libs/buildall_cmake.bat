@@ -1,6 +1,6 @@
 @echo off
 setlocal
-chcp 65001
+chcp 65001 > nul
 cd /d %~dp0
 
 if NOT "%CMAKE_COMMAND%" == "" goto pass_set_cmake
@@ -9,43 +9,43 @@ set OPT=
 :pass_set_cmake
 
 :retry_vs
-rem echo f. Visual Studio 18 2026 Win32
-rem echo g. Visual Studio 18 2026 x64
-rem echo h. Visual Studio 18 2026 ARM64
-echo 1. Visual Studio 17 2022 Win32
-echo 2. Visual Studio 17 2022 x64
-echo 3. Visual Studio 17 2022 ARM64
-echo 4. Visual Studio 16 2019 Win32
-echo 5. Visual Studio 16 2019 x64
-echo 6. Visual Studio 15 2017
-echo 7. Visual Studio 14 2015
-echo 8. Visual Studio 12 2013
-echo 9. Visual Studio 11 2012
-echo a. Visual Studio 10 2010
-echo b. Visual Studio 9 2008
-rem echo c. Visual Studio 8 2005
-rem echo d. Visual Studio NMake (experimental)
-rem echo e. Cygwin MinGW Release + Unix Makefiles (experimental)
+echo 1. Visual Studio 18 2026 Win32
+echo 2. Visual Studio 18 2026 x64
+echo 3. Visual Studio 18 2026 ARM64
+echo 4. Visual Studio 17 2022 Win32
+echo 5. Visual Studio 17 2022 x64
+echo 6. Visual Studio 17 2022 ARM64
+echo 7. Visual Studio 16 2019 Win32
+echo 8. Visual Studio 16 2019 x64
+echo 9. Visual Studio 15 2017
+echo a. Visual Studio 14 2015
+echo b. Visual Studio 12 2013
+echo c. Visual Studio 11 2012
+echo d. Visual Studio 10 2010
+echo e. Visual Studio 9 2008
+rem echo f. Visual Studio 8 2005
+rem echo g. Visual Studio NMake (experimental)
+rem echo h. Cygwin MinGW Release + Unix Makefiles (experimental)
 set /p no="select no "
 
 echo %no%
-if "%no%" == "f" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=Win32 & goto build_all
-if "%no%" == "g" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "h" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
-if "%no%" == "1" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=Win32 & goto build_all
-if "%no%" == "2" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "3" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
-if "%no%" == "4" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=Win32 & goto build_all
-if "%no%" == "5" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=x64   & goto build_all
-if "%no%" == "6" set GENERATOR="Visual Studio 15 2017" & goto build_all
-if "%no%" == "8" set GENERATOR="Visual Studio 14 2015" & goto build_all
-if "%no%" == "8" set GENERATOR="Visual Studio 12 2013" & goto build_all
-if "%no%" == "9" set GENERATOR="Visual Studio 11 2012" & goto build_all
-if "%no%" == "a" set GENERATOR="Visual Studio 10 2010" & goto build_all
-if "%no%" == "b" set GENERATOR="Visual Studio 9 2008" & goto build_all
-if "%no%" == "c" set GENERATOR="Visual Studio 8 2005" & call :cmake_3_11_4 & goto build_all_2
-if "%no%" == "d" set GENERATOR="NMake Makefiles" & set OPT=-DCMAKE_BUILD_TYPE=Release & goto build_all
-if "%no%" == "e" set GENERATOR="Unix Makefiles" & set OPT=-DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake & goto build_all
+if "%no%" == "1" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=Win32 & goto build_all
+if "%no%" == "2" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=x64   & goto build_all
+if "%no%" == "3" set GENERATOR="Visual Studio 18 2026" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
+if "%no%" == "4" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=Win32 & goto build_all
+if "%no%" == "5" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=x64   & goto build_all
+if "%no%" == "6" set GENERATOR="Visual Studio 17 2022" & set OPT=-DARCHITECTURE=ARM64 & goto build_all
+if "%no%" == "7" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=Win32 & goto build_all
+if "%no%" == "8" set GENERATOR="Visual Studio 16 2019" & set OPT=-DARCHITECTURE=x64   & goto build_all
+if "%no%" == "9" set GENERATOR="Visual Studio 15 2017" & goto build_all
+if "%no%" == "a" set GENERATOR="Visual Studio 14 2015" & goto build_all
+if "%no%" == "b" set GENERATOR="Visual Studio 12 2013" & goto build_all
+if "%no%" == "c" set GENERATOR="Visual Studio 11 2012" & goto build_all
+if "%no%" == "d" set GENERATOR="Visual Studio 10 2010" & goto build_all
+if "%no%" == "e" set GENERATOR="Visual Studio 9 2008" & goto build_all
+if "%no%" == "f" set GENERATOR="Visual Studio 8 2005" & call :cmake_3_11_4 & goto build_all_2
+if "%no%" == "g" set GENERATOR="NMake Makefiles" & set OPT=-DCMAKE_BUILD_TYPE=Release & goto build_all
+if "%no%" == "h" set GENERATOR="Unix Makefiles" & set OPT=-DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake & goto build_all
 echo ? retry
 goto retry_vs
 
