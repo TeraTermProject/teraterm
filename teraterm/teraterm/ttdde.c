@@ -549,13 +549,13 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		ParamBinaryFlag = Command[1] & 1;
 		break;
 	case CmdSetLogOpt:
-		ts.LogBinary        = Command[LogOptBinary] - 0x30;
-		ts.Append           = Command[LogOptAppend] - 0x30;
-		ts.LogTypePlainText = Command[LogOptPlainText] - 0x30;
-		ts.LogTimestamp     = Command[LogOptTimestamp] - 0x30;
-		ts.LogHideDialog    = Command[LogOptHideDialog] - 0x30;
+		ts.LogBinary                 = Command[LogOptBinary] - 0x30;
+		ts.Append                    = Command[LogOptAppend] - 0x30;
+		ts.LogTypePlainText          = Command[LogOptPlainText] - 0x30;
+		ts.LogTimestamp              = Command[LogOptTimestamp] - 0x30;
+		ts.LogDialogShowState        = Command[LogOptDialogShowState] - 0x30;
 		ts.LogAllBuffIncludedInFirst = Command[LogOptIncScrBuff] - 0x30;
-		ts.LogTimestampType = Command[LogOptTimestampType] - 0x30;
+		ts.LogTimestampType          = Command[LogOptTimestampType] - 0x30;
 		break;
 	case CmdSetXmodemOpt:
 		ParamXmodemOpt = Command[1] & 3;

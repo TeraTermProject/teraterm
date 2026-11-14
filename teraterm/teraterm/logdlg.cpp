@@ -97,8 +97,7 @@ static void SetLogFlags(HWND Dialog, TTTSet *pts)
 		pts->LogTimestamp = val;
 	}
 
-	GetRB(Dialog, &val, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
-	pts->LogHideDialog = val;
+	pts->LogDialogShowState = (WORD)GetCurSel(Dialog, IDC_LOGGINGDIALOG_DROPDOWN) - 1;
 
 	GetRB(Dialog, &val, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 	pts->LogAllBuffIncludedInFirst = val;
@@ -274,7 +273,7 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ IDC_BOM, "DLG_FOPT_BOM" },
 		{ IDC_APPEND, "DLG_FOPT_APPEND" },
 		{ IDC_PLAINTEXT, "DLG_FOPT_PLAIN" },
-		{ IDC_HIDEDIALOG, "DLG_FOPT_HIDEDIALOG" },
+		{ IDC_LOGGINGDIALOG, "DLG_FOPT_LOGGINGDIALOG" },
 		{ IDC_ALLBUFF_INFIRST, "DLG_FOPT_ALLBUFFINFIRST" },
 		{ IDC_TIMESTAMP, "DLG_FOPT_TIMESTAMP" },
 		{ IDC_NEW_OVERWRITE, "DLG_FOPT_NEW_OVERWRITE" },
@@ -286,6 +285,11 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		{ "DLG_FOPT_TIMESTAMP_UTC", L"UTC" },
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", L"Elapsed Time (Logging)" },
 		{ "DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", L"Elapsed Time (Connection)" },
+	};
+	static const I18nTextInfo loggingdialog_list[] = {
+		{ "DLG_FOPT_LOGGINGDIALOG_HIDDEN", L"Hidden" },
+		{ "DLG_FOPT_LOGGINGDIALOG_MINIMIZED", L"Minimized" },
+		{ "DLG_FOPT_LOGGINGDIALOG_NORMAL", L"Normal" },
 	};
 	LogDlgWork_t *work = (LogDlgWork_t *)GetWindowLongPtr(Dialog, DWLP_USER);
 
@@ -328,10 +332,10 @@ static INT_PTR CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPAR
 		// plain text
 		CheckDlgButton(Dialog, IDC_PLAINTEXT, pts->LogTypePlainText == 0 ? BST_UNCHECKED : BST_CHECKED);
 
-		// Hide dialog チェックボックス
-		if (pts->LogHideDialog) {
-			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
-		}
+		// Hide dialog ドロップダウンリスト
+		SetI18nListW("Tera Term", Dialog, IDC_LOGGINGDIALOG_DROPDOWN, loggingdialog_list,
+					 _countof(loggingdialog_list), pts->UILanguageFileW, 0);
+		SendDlgItemMessageA(Dialog, IDC_LOGGINGDIALOG_DROPDOWN, CB_SETCURSEL, pts->LogDialogShowState, 0);
 
 		// Include screen buffer チェックボックス
 		if (pts->LogAllBuffIncludedInFirst) {
