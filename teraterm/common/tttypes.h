@@ -116,6 +116,13 @@ enum LogTimestampType {
     TIMESTAMP_ELAPSED_CONNECTED
 };
 
+// Logging dialog show state
+enum LogDialogShowState {
+	SHOWSTATE_HIDDEN,
+	SHOWSTATE_MINIMIZED,
+	SHOWSTATE_NORMAL
+};
+
 // log flags (used in ts.LogFlag)
 #define LOG_TEL 1
 #define LOG_KMT 2
@@ -470,7 +477,7 @@ struct tttset {
 	WORD HostDialogOnStartup;
 	WORD MouseEventTracking;
 	WORD KillFocusCursor;
-	WORD LogHideDialog;
+	WORD LogHideDialog;					// 廃止,LogDialogShowState へ移行
 	WORD FTHideDialog;
 	int TerminalOldWidth;
 	int TerminalOldHeight;
@@ -620,6 +627,7 @@ struct tttset {
 	DWORD SerialSendLimit;				// シリアル送信制限(0=制限しない/1～=送信バイト数)
 	wchar_t *TitleW;						// local title (TComVar.TitleRemoteW = remote title)
 	wchar_t *HostNameW;
+	WORD LogDialogShowState;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;

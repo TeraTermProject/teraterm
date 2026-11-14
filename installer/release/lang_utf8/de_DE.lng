@@ -1,6 +1,6 @@
 ﻿[Info]
 language=German
-date=2026-10-11 by TeraTerm Project
+date=2026-11-15 by TeraTerm Project
 contributor=Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -535,6 +535,10 @@ DLG_FOPT_TIMESTAMP_LOCAL=Local Time
 DLG_FOPT_TIMESTAMP_UTC=UTC
 DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
+DLG_FOPT_LOGGINGDIALOG=Log&dialog
+DLG_FOPT_LOGGINGDIALOG_HIDDEN=Ausgeblendet
+DLG_FOPT_LOGGINGDIALOG_MINIMIZED=Minimiert
+DLG_FOPT_LOGGINGDIALOG_NORMAL=Normal
 
 DLG_XOPT=Option
 DLG_XOPT_CHECKSUM=Check&summe

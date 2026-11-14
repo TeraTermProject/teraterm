@@ -18,7 +18,7 @@ Causes Tera Term to start logging.
 </p>
 
 <pre class="macro-syntax">
-logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;include screen buffer flag&gt; [&lt;timestamp type]]]]]
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;include screen buffer flag&gt; [&lt;timestamp type&gt; [&lt;logging dialog show state&gt;]]]]]]
 </pre>
 
 <h2>Remarks</h2>
@@ -45,7 +45,8 @@ If &lt;binary flag&gt; is non-zero, &lt;plain text flag&gt; and &lt;timestamp fl
 </p>
 
 <p>
-If &lt;hide dialog flag&gt; is not 0, "Log" dialog box is not displayed.
+If &lt;hide dialog flag&gt; is 0, "Logging" dialog box is minimized. (default)<br>
+If &lt;hide dialog flag&gt; is non-zero, "Logging" dialog box is not displayed.
 </p>
 
 <p>
@@ -82,6 +83,23 @@ If &lt;include screen buffer flag&gt; is not 0, all current screen buffer is wri
     <td>Elapsed Time (Connection)</td>
   </tr>
 </table>
+
+<p>
+If &lt;logging dialog show state&gt; is set to "normal", the "Logging" dialog box is displayed. <em>(version 5.8.0 or later)</em><br>
+If &lt;hide dialog flag&gt; is non-zero, the &lt;logging dialog show state&gt; setting is ignored.<br>
+The relationship between &lt;hide dialog flag&gt; and &lt;logging dialog show state&gt; is shown below.
+<table>
+  <tr>
+    <th>&lt;hide dialog flag&gt;</th>
+    <th>&lt;logging dialog show state&gt;</th>
+    <th>"Logging" dialog box</th>
+  </tr>
+  <tr> <td>Non-zero</td> <td>other than "normal"</td>  <td>Hidden</td>    </tr>
+  <tr> <td>Non-zero</td> <td>"normal"</td>             <td>Hidden</td>    </tr>
+  <tr> <td>0</td>        <td>other than "normal"</td>  <td>Minimized</td> </tr>
+  <tr> <td>0</td>        <td>"normal"</td>             <td>Displayed</td> </tr>
+</table>
+</p>
 
 <p>
 If a log file is successfully opened, the system variable "result" is set to 0. Otherwise, the "result" is set to 1. <em>(version 4.62 or later)</em>
@@ -149,6 +167,7 @@ return
   <li><a href="logclose.html">logclose</a></li>
   <li><a href="statusbox.html">statusbox</a></li>
   <li><a href="gettime.html">gettime</a></li>
+  <li><a href="loginfo.html">loginfo</a></li>
 </ul>
 
 </body>

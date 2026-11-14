@@ -201,7 +201,7 @@ static BOOL OpenFTDlg(PFileVar fv)
 	info.DlgCaption = DlgCaption;
 	info.FileName = NULL;
 	info.FullName = fv->FullName;
-	info.HideDialog = ts.LogHideDialog ? TRUE : FALSE;
+	info.LogDialogShowState = ts.LogDialogShowState;
 	info.HMainWin = HVTWin;
 	FTDlg->Create(hInst, &info);
 	FTDlg->RefreshNum(0, 0, fv->ByteCount);
@@ -935,7 +935,9 @@ void FLogInfo(char *param_ptr, size_t param_len)
 			+ ((ts.Append != 0) << 1)
 			+ ((ts.LogTypePlainText != 0) << 2)
 			+ ((ts.LogTimestamp != 0) << 3)
-			+ ((ts.LogHideDialog != 0) << 4);
+			+ ((ts.LogDialogShowState == SHOWSTATE_HIDDEN) << 4)
+			+ ((ts.LogDialogShowState == SHOWSTATE_MINIMIZED) << 5)
+			+ ((ts.LogDialogShowState == SHOWSTATE_NORMAL) << 6);
 		char *filenameU8 = ToU8W(fv->FullName);
 		strncpy_s(param_ptr + 1, param_len - 1, filenameU8, _TRUNCATE);
 		free(filenameU8);

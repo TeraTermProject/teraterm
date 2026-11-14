@@ -13,6 +13,8 @@
 #define IDC_ALLBUFF_INFIRST             1006
 #define IDC_TIMESTAMPTYPE               1007
 #define IDC_BOM                         1008
+#define IDC_LOGGINGDIALOG               1009
+#define IDC_LOGGINGDIALOG_DROPDOWN      1010
 #define IDC_XOPTCHECK                   1101
 #define IDC_XOPTCRC                     1102
 #define IDC_XOPT1K                      1103
@@ -37,7 +39,7 @@
 #define IDC_FILENAME                    65535
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Tamil(தமிழ்)
-date=2026-10-11 by TeraTerm Project
+date=2026-11-15 by TeraTerm Project
 contributor=திட்டத்தால் புதுப்பிக்கப்பட்டது (2024-02-24)
 
 [Tera Term]
@@ -535,6 +535,10 @@ DLG_FOPT_TIMESTAMP_LOCAL=உள்ளக நேரம்
 DLG_FOPT_TIMESTAMP_UTC=UTC
 DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=கடந்த நேரம் (பதிவு செய்தல்)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=கடந்த நேரம் (இணைப்பு)
+DLG_FOPT_LOGGINGDIALOG=பதிவு உரையாடல்(&D)
+DLG_FOPT_LOGGINGDIALOG_HIDDEN=மறைக்கப்பட்டது
+DLG_FOPT_LOGGINGDIALOG_MINIMIZED=சிறிதாக்கப்பட்டது
+DLG_FOPT_LOGGINGDIALOG_NORMAL=இயல்பானது
 
 DLG_XOPT=விருப்பம்
 DLG_XOPT_CHECKSUM=சரிபார்தொகை
