@@ -949,6 +949,7 @@ void SetLogOption(int *LogFlags)
 	Cmd[LogOptHideDialog]    = 0x30 + (LogFlags[LogOptHideDialog] != 0);
 	Cmd[LogOptIncScrBuff]    = 0x30 + (LogFlags[LogOptIncScrBuff] != 0);
 	Cmd[LogOptTimestampType] = 0x30 + LogFlags[LogOptTimestampType];
+	Cmd[LogOptShowDialog]    = 0x30 + (LogFlags[LogOptShowDialog] != 0);
 	Cmd[LogOptMax+1]         = 0;
 	DdeClientTransaction(Cmd, sizeof(Cmd), ConvH, 0, CF_OEMTEXT, XTYP_EXECUTE, 1000, NULL);
 }

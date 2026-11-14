@@ -90,6 +90,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 		}
 	}
 	HideDialog = info->HideDialog;
+	LogShowDialog = info->LogShowDialog;
 	HMainWin = info->HMainWin;
 
 	Pause = FALSE;
@@ -119,7 +120,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	if (!HideDialog) {
 		// Visible = False のダイアログを表示する
 		ShowWindow(SW_SHOWNORMAL);
-		if (OpId == OpLog) {
+		if (OpId == OpLog && (!LogShowDialog)) {
 			ShowWindow(SW_MINIMIZE);
 		}
 	}

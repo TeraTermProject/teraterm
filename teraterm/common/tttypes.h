@@ -620,6 +620,7 @@ struct tttset {
 	DWORD SerialSendLimit;				// シリアル送信制限(0=制限しない/1～=送信バイト数)
 	wchar_t *TitleW;						// local title (TComVar.TitleRemoteW = remote title)
 	wchar_t *HostNameW;
+	WORD LogShowDialog;
 
 	// Experimental
 	BYTE ExperimentalTreePropertySheetEnable;
