@@ -14,10 +14,10 @@ if(MINGW)
 else()
   if(IS_MULTI_CONFIG)
     set(ZLIB_LIB
-      debug ${ZLIB_LIBRARY_DIRS}/zsd.lib
-      optimized ${ZLIB_LIBRARY_DIRS}/zs.lib
+      debug ${ZLIB_LIBRARY_DIRS}/libzsd.lib
+      optimized ${ZLIB_LIBRARY_DIRS}/libzs.lib
     )
   else()
-    set(ZLIB_LIB ${ZLIB_LIBRARY_DIRS}/zs.lib)
+    set(ZLIB_LIB ${ZLIB_LIBRARY_DIRS}/libzs.lib)
   endif()
 endif()
