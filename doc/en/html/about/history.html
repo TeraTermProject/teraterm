@@ -4437,12 +4437,15 @@ SYNOPSIS:
 
 <h3 id="ttssh_3.8.0">YYYY.MM.DD (Ver 3.8.0 not released yet)</h3>
 <ul class="history">
-  <!--li>Changes
+  <li>Changes
     <ul>
       <li>
+        Host name matching against known_hosts is now ASCII case-insensitive.
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1601" target="_blank">issue #1601</a>)<br>
+        Previously, even if the host key of host.example.com was recorded in known_hosts, connecting to Host.example.com treated it as an unknown host and added a duplicate host key.
       </li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>Bug fixes
     <ul>
