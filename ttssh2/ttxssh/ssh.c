@@ -3154,7 +3154,7 @@ void SSH_init(PTInstVar pvar)
 
 void SSH_open(PTInstVar pvar)
 {
-	pvar->ssh_state.hostname = _strdup(pvar->ts->HostName);
+	pvar->ssh_state.hostname = ToU8W(pvar->ts->HostNameW);
 	pvar->ssh_state.tcpport  = pvar->ts->TCPPort;
 	pvar->ssh_state.win_cols = pvar->ts->TerminalWidth;
 	pvar->ssh_state.win_rows = pvar->ts->TerminalHeight;

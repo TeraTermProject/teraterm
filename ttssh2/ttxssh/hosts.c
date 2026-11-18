@@ -990,7 +990,7 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 
 	// ホスト名に置換する
 	GetDlgItemTextW(dlg, IDC_HOSTWARNING, buf, _countof(buf));
-	hostW = ToWcharA(pvar->hosts_state.prefetched_hostname);
+	hostW = ToWcharU8(pvar->hosts_state.prefetched_hostname);
 	aswprintf(&buf2, buf, hostW);
 	free(hostW);
 	SetDlgItemTextW(dlg, IDC_HOSTWARNING, buf2);

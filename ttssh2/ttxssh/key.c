@@ -29,6 +29,9 @@
 #include "resource.h"
 #include "dlglib.h"
 #include "ssherr.h"
+#include "codeconv.h"
+#include "asprintf.h"
+#include "win32helper.h"
 
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
@@ -2361,63 +2364,62 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 	}
 }
 
-//typedef INT_PTR (CALLBACK* DLGPROC)(HWND, UINT, WPARAM, LPARAM);
 static INT_PTR CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static const DlgTextInfo text_info[] = {
+		{ 0, "DLG_HOSTKEY_ROTATION_TITLE" },
+		{ IDC_HOSTKEY_MESSAGE, "DLG_HOSTKEY_ROTATION_WARNING" },
+		{ IDC_FP_HASH_ALG, "DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM" },
+		{ IDC_ADDKEY_TEXT, "DLG_HOSTKEY_ROTATION_ADD" },
+		{ IDC_REMOVEKEY_TEXT, "DLG_HOSTKEY_ROTATION_REMOVE" },
+		{ IDOK, "BTN_YES" },
+		{ IDCANCEL, "BTN_NO" },
+	};
 	PTInstVar pvar;
-	char buf[1024];
-	char *host;
-	struct hostkeys_update_ctx *ctx;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
+		struct hostkeys_update_ctx *ctx;
+		wchar_t *fmt;
+		wchar_t *buf;
+		wchar_t *hostW;
+
 		pvar = (PTInstVar)lParam;
-		SetWindowLongPtr(dlg, DWLP_USER, lParam);
-
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->UIMsg);
-
-		host = pvar->ssh_state.hostname;
+		SetWindowLongPtrW(dlg, DWLP_USER, lParam);
 		ctx = pvar->hostkey_ctx;
 
-		GetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, uimsg);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-			pvar->UIMsg, host, ctx->nnew, ctx->nold
-			);
-		SetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, buf);
+		SetI18nDlgStrsW(dlg, "TTSSH", text_info, _countof(text_info),
+		                pvar->ts->UILanguageFileW);
 
-		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->UIMsg);
+		hostW = ToWcharU8(pvar->ssh_state.hostname);
+		hGetDlgItemTextW(dlg, IDC_HOSTKEY_MESSAGE, &fmt);
+		aswprintf(&buf, fmt, hostW, ctx->nnew, ctx->nold);
+		SetDlgItemTextW(dlg, IDC_HOSTKEY_MESSAGE, buf);
+		free(buf);
+		free(fmt);
+		free(hostW);
 
-		GetDlgItemText(dlg, IDC_ADDKEY_TEXT, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_ADD", pvar, uimsg);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, ctx->nnew);
-		SetDlgItemText(dlg, IDC_ADDKEY_TEXT, buf);
+		hGetDlgItemTextW(dlg, IDC_ADDKEY_TEXT, &fmt);
+		aswprintf(&buf, fmt, ctx->nnew);
+		SetDlgItemTextW(dlg, IDC_ADDKEY_TEXT, buf);
+		free(buf);
+		free(fmt);
 
-		GetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_REMOVE", pvar, uimsg);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->UIMsg, ctx->nold);
-		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
+		hGetDlgItemTextW(dlg, IDC_REMOVEKEY_TEXT, &fmt);
+		aswprintf(&buf, fmt, ctx->nold);
+		SetDlgItemTextW(dlg, IDC_REMOVEKEY_TEXT, buf);
+		free(buf);
+		free(fmt);
 
 		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
 		hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 
-		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_YES", pvar, uimsg);
-		SetDlgItemText(dlg, IDOK, pvar->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_NO", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->UIMsg);
-
 		CenterWindow(dlg, GetParent(dlg));
 		return TRUE;			/* because we do not set the focus */
+	}
 
 	case WM_COMMAND:
-		pvar = (PTInstVar)GetWindowLongPtr(dlg, DWLP_USER);
+		pvar = (PTInstVar)GetWindowLongPtrW(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:

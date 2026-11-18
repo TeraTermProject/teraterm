@@ -382,7 +382,7 @@ struct _SSHPacketHandlerItem {
 };
 
 typedef struct {
-	char *hostname;
+	char *hostname;		// 文字コード UTF-8
 
 	int server_protocol_flags;
 	char *server_ID;
