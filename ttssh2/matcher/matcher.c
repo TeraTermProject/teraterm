@@ -37,6 +37,10 @@ See LICENSE.TXT for the license.
 
 #include "matcher.h"
 
+/* ASCII-only case folding: host names (and known_hosts patterns) are
+   case-insensitive, like OpenSSH. Avoids locale/signed-char pitfalls of tolower(). */
+#define LC(ch) (((ch) >= 'A' && (ch) <= 'Z') ? (char)((ch) - 'A' + 'a') : (ch))
+
 /* This is the "slow" wildcard matcher, but at least it is worst-case quadratic
    in the length of the string (as opposed to exponential).
    Since it's also best-case quadratic, it should only be used for unusual
@@ -63,7 +67,7 @@ static BOOL wildcard_match_pattern(char const *pattern, int patternLen,
 			canBeAt[0] = 0;
 		} else {
 			for (i = strLen; i > 0; i--) {
-				canBeAt[i] = canBeAt[i - 1] && str[i - 1] == patternCh;
+				canBeAt[i] = canBeAt[i - 1] && LC(str[i - 1]) == LC(patternCh);
 		}
 		canBeAt[0] = 0;
 		}
@@ -84,7 +88,7 @@ BOOL match_pattern(char const *pattern, char const *str) {
 	char patternCh = *pattern;
 	char strCh = *str;
 
-	while (strCh != 0 && (strCh == patternCh || patternCh == '?')) {
+	while (strCh != 0 && (LC(strCh) == LC(patternCh) || patternCh == '?')) {
 		str++;
 		pattern++;
 		strCh = *str;
@@ -123,7 +127,7 @@ BOOL match_pattern(char const *pattern, char const *str) {
 		} else {
 				patternCh = pattern[patternLen - 1];
 				strCh = str[strLen - 1];
-				while (patternLen > 1 && (strCh == patternCh || patternCh == '?')) {
+				while (patternLen > 1 && (LC(strCh) == LC(patternCh) || patternCh == '?')) {
 					strLen--;
 					patternLen--;
 					strCh = str[strLen - 1];
