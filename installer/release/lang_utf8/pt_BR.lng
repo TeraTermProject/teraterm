@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Portuguese (Português) - Brazil
-date=2026-10-11 by TeraTerm Project
+date=2026-11-15 by TeraTerm Project
 contributor=Waldemar Vaz Passarinho Neto (2025-05-07)
 
 [Tera Term]
@@ -532,6 +532,10 @@ DLG_FOPT_TIMESTAMP_LOCAL=Hora Local
 DLG_FOPT_TIMESTAMP_UTC=UTC
 DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Tempo Decorrido (Log)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Tempo Decorrido (Conexão)
+DLG_FOPT_LOGGINGDIALOG=&Diálogo de registro
+DLG_FOPT_LOGGINGDIALOG_HIDDEN=Oculta
+DLG_FOPT_LOGGINGDIALOG_MINIMIZED=Minimizada
+DLG_FOPT_LOGGINGDIALOG_NORMAL=Normal
 
 DLG_XOPT=Opção
 DLG_XOPT_CHECKSUM=&Checksum

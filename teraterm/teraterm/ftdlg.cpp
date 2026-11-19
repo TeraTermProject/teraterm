@@ -89,7 +89,17 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 			FileName = _wcsdup(p + 1);
 		}
 	}
-	HideDialog = info->HideDialog;
+
+	if (OpId == OpLog) {
+		LogDialogShowState = info->LogDialogShowState;
+		if (LogDialogShowState == SHOWSTATE_HIDDEN) {
+			HideDialog = TRUE;
+		} else {
+			HideDialog = FALSE;
+		}
+	} else {
+		HideDialog = info->HideDialog;
+	}
 	HMainWin = info->HMainWin;
 
 	Pause = FALSE;
@@ -119,7 +129,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, CFileTransDlg::Info *info)
 	if (!HideDialog) {
 		// Visible = False のダイアログを表示する
 		ShowWindow(SW_SHOWNORMAL);
-		if (OpId == OpLog) {
+		if (OpId == OpLog && (LogDialogShowState == SHOWSTATE_MINIMIZED)) {
 			ShowWindow(SW_MINIMIZE);
 		}
 	}
