@@ -176,6 +176,10 @@ void RegGetStatus(BOOL *use_ini, wchar_t **inifile)
 	}
 }
 
+BOOL RegIsUseINI() {
+	return bUseINI;
+}
+
 /* ==========================================================================
 	Function Name	: (HKEY) RegCreate()
 	Outline			: 指定したレジストリキーを作成（またはオープン）する

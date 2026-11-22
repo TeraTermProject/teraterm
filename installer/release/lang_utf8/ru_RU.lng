@@ -1240,6 +1240,7 @@ MSG_ERROR_MAKETTL=Не удается создать 'ttpmenu.TTL'\n
 MSG_ERROR_LAUNCH=При запуске приложения произошла ошибка\n
 MSG_ERROR_NOREGNAME=Ошибка: нет имени регистра
 MSG_ERROR_INVALIDREGNAME=Нельзя использовать "\\" в имени регистра
+MSG_ERROR_INVALIDSECTIONNAME=Нельзя использовать "]" в имени секции
 MSG_ERROR_NOHOST=Ошибка: нет имени хоста
 MSG_ERROR_NOMACRO=Ошибка: нет имени файла макросов
 MSG_ERROR_CHECKFILE=Проверяемый [%s] файл был поврежден.\n

@@ -64,6 +64,9 @@
 
   <!--li>その他
     <ul>
+      <li><a href="#ttssh_3.8.0">TTSSH 3.8.0</a> へ差し替えた。</li>
+      <li><a href="#ttproxy_1.0.0.28">TTProxy 1.0.0.28</a> へ差し替えた。</li>
+      <li><a href="#ttmenu_1.25">TeraTerm Menu 1.25</a> へ差し替えた。</li>
       <li>
       </li>
     </ul>
@@ -4408,6 +4411,15 @@
       </li>
     </ul>
   </li-->
+  <li>変更
+    <ul>
+      <li>
+        known_hosts のホスト名の照合で、英字(ASCII)の大文字と小文字を区別しないようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1601" target="_blank">issue #1601</a>)<br>
+        変更前は、例えば host.example.com のホスト鍵が known_hosts に記録されていても Host.example.com へ接続すると未知のホストとして扱われ、ホスト鍵が重複して追加されていた。
+      </li>
+    </ul>
+  </li>
 
   <!--li>バグ修正
     <ul>
@@ -6712,6 +6724,15 @@
 
 
 <h2 id="ttmenu">TeraTerm Menu</h2>
+
+<h3 id="ttmenu_1.25">YYYY.MM.DD (Ver 1.25 not released yet)</h3>
+<ul class="history">
+      <li>
+        iniファイル使用時、設定ダイアログからの入力で登録名に "]" が含まれる場合にエラーを表示するようにした。
+        (<a href="https://github.com/TeraTermProject/teraterm/issues/1617" target="_blank">issue #1617</a>)<br>
+        <a href="https://github.com/TeraTermProject/teraterm/tree/main/installer/ttpmenu" target="_blank">レジストリからiniファイルへの変換スクリプト</a>を登録名に含まれる "]" を削除するよう修正した。
+      </li>
+</ul>
 
 <h3 id="ttmenu_1.24">2026.09.04 (Ver 1.24)</h3>
 <ul class="history">
