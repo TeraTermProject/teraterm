@@ -1239,6 +1239,7 @@ MSG_ERROR_MAKETTL='ttpmenu.TTL' oluşturulamadı\n
 MSG_ERROR_LAUNCH=Uygulama başlatma başarısız.\n
 MSG_ERROR_NOREGNAME=hata: kayıt defteri adı yok
 MSG_ERROR_INVALIDREGNAME=kayıt defteri adında "\\" kullanılamaz
+MSG_ERROR_INVALIDSECTIONNAME=bölüm adında "]" kullanılamaz
 MSG_ERROR_NOHOST=hata: ana bilgisayar adı yok
 MSG_ERROR_NOMACRO=hata: makro dosya adı yok
 MSG_ERROR_CHECKFILE=[%s] dosyası kontrol edilemedi.\n

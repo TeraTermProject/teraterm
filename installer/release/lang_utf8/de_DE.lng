@@ -1242,6 +1242,7 @@ MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n
 MSG_ERROR_LAUNCH=Launching the application was failure.\n
 MSG_ERROR_NOREGNAME=error: no registry name
 MSG_ERROR_INVALIDREGNAME=can't use "\\" in registry name
+MSG_ERROR_INVALIDSECTIONNAME=can't use "]" in section name
 MSG_ERROR_NOHOST=Fehler: Kein Hostname
 MSG_ERROR_NOMACRO=Fehler: Kein Makrodateiname
 MSG_ERROR_CHECKFILE=checking [%s] file was failure.\n

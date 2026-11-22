@@ -1239,6 +1239,7 @@ MSG_ERROR_MAKETTL='ttpmenu.TTL' ஐ உருவாக்க முடியவ�
 MSG_ERROR_LAUNCH=பயன்பாட்டை துவக்குவது தோல்வியடைந்தது.\n
 MSG_ERROR_NOREGNAME=பிழை: பதிவேட்டில் பெயர் இல்லை
 MSG_ERROR_INVALIDREGNAME=பதிவேட்டில் "\\" ஐப் பயன்படுத்த முடியாது
+MSG_ERROR_INVALIDSECTIONNAME=பிரிவு பெயரில் "]" ஐப் பயன்படுத்த முடியாது
 MSG_ERROR_NOHOST=பிழை: புரவலன் பெயர் இல்லை
 MSG_ERROR_NOMACRO=பிழை: பெரிய கோப்பு பெயர் இல்லை
 MSG_ERROR_CHECKFILE=[%s] கோப்பைச் சரிபார்ப்பது தோல்வி.\n

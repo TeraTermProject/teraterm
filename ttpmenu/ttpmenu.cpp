@@ -1575,6 +1575,14 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 		::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
+	if (RegIsUseINI()) {
+		if (wcspbrk(g_JobInfo.szName, L"]") != NULL) {
+			UTIL_get_lang_msgW("MSG_ERROR_INVALIDSECTIONNAME", uimsg, _countof(uimsg),
+							   L"can't use \"]\" in section name", UILanguageFileW);
+			::MessageBoxW(hWnd, uimsg, L"TeraTerm Menu", MB_ICONSTOP | MB_OK);
+			return FALSE;
+		}
+	}
 
 	if (::IsDlgButtonChecked(hWnd, RADIO_LOGIN) == BST_CHECKED)
 		g_JobInfo.dwMode = MODE_AUTOLOGIN;

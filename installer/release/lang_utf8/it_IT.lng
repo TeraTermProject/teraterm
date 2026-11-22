@@ -1239,6 +1239,7 @@ MSG_ERROR_MAKETTL=Impossibile eseguire 'ttpmenu.TTL'\n
 MSG_ERROR_LAUNCH=L'avvio dell'applicazione ha prodotto un errore.\n
 MSG_ERROR_NOREGNAME=errore: nessun nome registro
 MSG_ERROR_INVALIDREGNAME=impossibile usare '\\' nel nome registro
+MSG_ERROR_INVALIDSECTIONNAME=impossibile usare ']' nel nome sezione
 MSG_ERROR_NOHOST=errore: nessun nome host
 MSG_ERROR_NOMACRO=errore: nessun nome file macro
 MSG_ERROR_CHECKFILE=controllo file [%s] non riuscito.\n

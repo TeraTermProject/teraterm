@@ -60,5 +60,6 @@ BOOL	RegGetBinary(HKEY hKey, const wchar_t *lpszValueName, void *buf, LPDWORD lp
 LONG	RegEnumEx(HKEY hKey, DWORD dwIndex, wchar_t *lpName, LPDWORD lpcName, LPDWORD lpReserved, wchar_t *lpClass, LPDWORD lpcClass, PFILETIME lpftLastWriteTime);
 LONG	RegDelete(HKEY hKey, const wchar_t *lpSubKey);
 void	RegGetStatus(BOOL *use_ini, wchar_t **inifile);
+BOOL	RegIsUseINI(void);
 
 #endif
