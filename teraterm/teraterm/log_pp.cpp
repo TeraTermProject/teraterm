@@ -102,7 +102,7 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		{ IDC_OPT_BINARY, "DLG_FOPT_BINARY" },
 		{ IDC_OPT_APPEND, "DLG_FOPT_APPEND" },
 		{ IDC_OPT_PLAINTEXT, "DLG_FOPT_PLAIN" },
-		{ IDC_OPT_HIDEDLG, "DLG_FOPT_HIDEDIALOG" },
+		{ IDC_OPT_LOGGINGDIALOG, "DLG_FOPT_LOGGINGDIALOG" },
 		{ IDC_OPT_INCBUF, "DLG_FOPT_ALLBUFFINFIRST" },
 		{ IDC_OPT_TIMESTAMP, "DLG_FOPT_TIMESTAMP" },
 	};
@@ -116,6 +116,14 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	};
 	SetI18nListW("Tera Term", m_hWnd, IDC_OPT_TIMESTAMP_TYPE, fopt_timestamp, _countof(fopt_timestamp),
 				 ts.UILanguageFileW, 0);
+
+	static const I18nTextInfo loggingdialog_list[] = {
+		{ "DLG_FOPT_LOGGINGDIALOG_HIDDEN", L"Hidden" },
+		{ "DLG_FOPT_LOGGINGDIALOG_MINIMIZED", L"Minimized" },
+		{ "DLG_FOPT_LOGGINGDIALOG_NORMAL", L"Normal" },
+	};
+	SetI18nListW("Tera Term", m_hWnd, IDC_OPT_LOGGINGDIALOG_DROPDOWN, loggingdialog_list,
+				 _countof(loggingdialog_list), ts.UILanguageFileW, 0);
 
 	// Viewlog Editor path
 	SetDlgItemTextW(IDC_VIEWLOG_EDITOR_EXE, ts.ViewlogEditorW);
@@ -184,7 +192,7 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	}
 	SetCheck(IDC_OPT_APPEND, ts.Append != 0);
 	SetCheck(IDC_OPT_PLAINTEXT, ts.LogTypePlainText != 0);
-	SetCheck(IDC_OPT_HIDEDLG, ts.LogHideDialog != 0);
+	SetCurSel(IDC_OPT_LOGGINGDIALOG_DROPDOWN, ts.LogDialogShowState);
 	SetCheck(IDC_OPT_INCBUF, ts.LogAllBuffIncludedInFirst != 0);
 	SetCheck(IDC_OPT_TIMESTAMP, ts.LogTimestamp != 0);
 
@@ -500,12 +508,7 @@ void CLogPropPageDlg::OnOK()
 		ts.LogTypePlainText = 0;
 	}
 
-	if (GetCheck(IDC_OPT_HIDEDLG)) {
-		ts.LogHideDialog = 1;
-	}
-	else {
-		ts.LogHideDialog = 0;
-	}
+	ts.LogDialogShowState = GetCurSel(IDC_OPT_LOGGINGDIALOG_DROPDOWN);
 
 	if (GetCheck(IDC_OPT_INCBUF)) {
 		ts.LogAllBuffIncludedInFirst = 1;

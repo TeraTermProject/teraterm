@@ -3287,9 +3287,13 @@ static WORD TTLLogOpen(void)
 	WORD Err;
 	int LogFlags[LogOptMax+1] = { 0 };
 	int TmpFlag;
+	int HideDialogFlag = 0;
+	char LogDialogShowStateStr[MaxStrLen];
 	char ret[2];
 
 	Err = 0;
+	LogDialogShowStateStr[0] = NULL;
+
 	GetStrVal(Str, &Err);
 	GetIntVal(&LogFlags[LogOptBinary], &Err);
 	GetIntVal(&LogFlags[LogOptAppend], &Err);
@@ -3306,7 +3310,7 @@ static WORD TTLLogOpen(void)
 
 	// hide file transfer dialog
 	if (!CheckParameterGiven()) goto EndLogOptions;
-	GetIntVal(&LogFlags[LogOptHideDialog], &Err);
+	GetIntVal(&HideDialogFlag, &Err);
 	if (Err!=0) return Err;
 
 	// Include screen buffer
@@ -3322,9 +3326,22 @@ static WORD TTLLogOpen(void)
 		return ErrSyntax;
 	LogFlags[LogOptTimestampType] = TmpFlag;
 
+	// Logging dialog show state
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetStrVal(LogDialogShowStateStr, &Err);
+	if (Err!=0) return Err;
+
 EndLogOptions:
 	if (strlen(Str) == 0 || GetFirstChar() != 0)
 		return ErrSyntax;
+
+	if (HideDialogFlag) {
+		LogFlags[LogOptDialogShowState] = SHOWSTATE_HIDDEN;
+	} else if (_stricmp(LogDialogShowStateStr, "normal") == 0) {
+		LogFlags[LogOptDialogShowState] = SHOWSTATE_NORMAL;
+	} else {
+		LogFlags[LogOptDialogShowState] = SHOWSTATE_MINIMIZED;
+	}
 
 	SetFile(Str);
 	SetLogOption(LogFlags);

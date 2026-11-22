@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Russian
-date=2026-10-11 by TeraTerm Project
+date=2026-11-15 by TeraTerm Project
 contributor=Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -535,6 +535,10 @@ DLG_FOPT_TIMESTAMP_LOCAL=Local Time
 DLG_FOPT_TIMESTAMP_UTC=UTC
 DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
+DLG_FOPT_LOGGINGDIALOG=&Диалог логирования
+DLG_FOPT_LOGGINGDIALOG_HIDDEN=Скрыто
+DLG_FOPT_LOGGINGDIALOG_MINIMIZED=Свернуто
+DLG_FOPT_LOGGINGDIALOG_NORMAL=Обычное
 
 DLG_XOPT=Опции
 DLG_XOPT_CHECKSUM=&Контрольная сумма

@@ -1,6 +1,6 @@
 ﻿[Info]
 language=Turkish
-date=2026-10-11 by TeraTerm Project
+date=2026-11-15 by TeraTerm Project
 contributor= Mehmet Cagri Aksoy (2025-08-04)
 
 [Tera Term]
@@ -535,6 +535,10 @@ DLG_FOPT_TIMESTAMP_LOCAL=Yerel Zaman
 DLG_FOPT_TIMESTAMP_UTC=UTC
 DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Geçen Süre (Kayıt)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Geçen Süre (Bağlantı)
+DLG_FOPT_LOGGINGDIALOG=Günlük iletişim kutusu(&D)
+DLG_FOPT_LOGGINGDIALOG_HIDDEN=Gizli
+DLG_FOPT_LOGGINGDIALOG_MINIMIZED=Küçültülmüş
+DLG_FOPT_LOGGINGDIALOG_NORMAL=Normal
 
 DLG_XOPT=Seçenek
 DLG_XOPT_CHECKSUM=Kontrol &toplamı

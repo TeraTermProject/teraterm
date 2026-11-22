@@ -987,8 +987,17 @@ void PASCAL _ReadIniFile(const wchar_t *FName, PTTSet ts)
 	/* Log with timestamp (2006.7.23 maya) */
 	ts->LogTimestamp = GetOnOff(Section, "LogTimestamp", FName, FALSE);
 
-	/* Log without transfer dialog */
-	ts->LogHideDialog = GetOnOff(Section, "LogHideDialog", FName, FALSE);
+	/* Logging dialog show state */
+	if (GetOnOff(Section, "LogHideDialog", FName, FALSE) == 1) {
+		ts->LogDialogShowState = SHOWSTATE_HIDDEN;
+	} else {
+		GetPrivateProfileString(Section, "LogDialogShowState", "minimized", Temp, sizeof(Temp), FName);
+		if (_stricmp(Temp, "normal") == 0) {
+			ts->LogDialogShowState = SHOWSTATE_NORMAL;
+		} else {
+			ts->LogDialogShowState = SHOWSTATE_MINIMIZED;
+		}
+	}
 
 	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogIncludeScreenBuffer", FName, FALSE);
 
@@ -2538,8 +2547,21 @@ void PASCAL _WriteIniFile(const wchar_t *FName, PTTSet ts)
 	/* Log with timestamp (2006.7.23 maya) */
 	WriteOnOff(Section, "LogTimestamp", FName, ts->LogTimestamp);
 
-	/* Log without transfer dialog */
-	WriteOnOff(Section, "LogHideDialog", FName, ts->LogHideDialog);
+	/* Logging dialog show state */
+	switch (ts->LogDialogShowState) {
+	case SHOWSTATE_HIDDEN:
+		WriteOnOff(Section, "LogHideDialog", FName, 1);
+		WritePrivateProfileString(Section, "LogDialogShowState", "", FName);
+		break;
+	case SHOWSTATE_NORMAL:
+		WriteOnOff(Section, "LogHideDialog", FName, 0);
+		WritePrivateProfileString(Section, "LogDialogShowState", "normal", FName);
+		break;
+	case SHOWSTATE_MINIMIZED:
+		WriteOnOff(Section, "LogHideDialog", FName, 0);
+		WritePrivateProfileString(Section, "LogDialogShowState", "minimized", FName);
+		break;
+	}
 
 	WriteOnOff(Section, "LogIncludeScreenBuffer", FName, ts->LogAllBuffIncludedInFirst);
 

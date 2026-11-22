@@ -193,9 +193,10 @@
 #define IDC_OPT_APPEND                  2536
 #define IDC_OPT_PLAINTEXT               2537
 #define IDC_OPT_TIMESTAMP               2538
-#define IDC_OPT_HIDEDLG                 2539
 #define IDC_OPT_INCBUF                  2540
 #define IDC_OPT_TIMESTAMP_TYPE          2541
+#define IDC_OPT_LOGGINGDIALOG           2542
+#define IDC_OPT_LOGGINGDIALOG_DROPDOWN  2543
 #define IDC_TRIMNLCHAR                  2564
 #define IDC_CLIPBOARD_NOTIFY            2566
 #define IDC_TITLEFMT_GROUP              2568
