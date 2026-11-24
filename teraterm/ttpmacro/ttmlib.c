@@ -250,6 +250,10 @@ int GetSpecialFolder(PCHAR dest, int dest_len, const char *type)
 {
 	char *folder;
 	GetSpecialFolderAlloc(type, &folder);
+	if (folder == NULL) {
+		dest[0] = 0;
+		return 0;
+	}
 	strncpy_s(dest, dest_len, folder, _TRUNCATE);
 	free(folder);
 	return 1;
