@@ -1,7 +1,7 @@
 ﻿[Info]
 language=Italian
 date=2026-11-15 by TeraTerm Project
-contributor=R.B. (2026-10-24)
+contributor=R.B. (2026-11-26)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -535,7 +535,7 @@ DLG_FOPT_TIMESTAMP_LOCAL=Ora locale
 DLG_FOPT_TIMESTAMP_UTC=UTC
 DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Tempo trascorso (registrazione)
 DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Tempo trascorso (connessione)
-DLG_FOPT_LOGGINGDIALOG=&Dialogo di log
+DLG_FOPT_LOGGINGDIALOG=&Finestra registrazione
 DLG_FOPT_LOGGINGDIALOG_HIDDEN=Nascosta
 DLG_FOPT_LOGGINGDIALOG_MINIMIZED=Ridotta a icona
 DLG_FOPT_LOGGINGDIALOG_NORMAL=Normale
