@@ -89,6 +89,23 @@ VS160COMNTOOLS=c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Com
 installer\release.bat を実行し、3を選択します。
 </p>
 
+<h3 id="build-library">x86 以外（x64, ARM64）のビルド</h3>
+<p>
+コマンドプロンプトを開き、環境変数をセットします。
+</p>
+
+<pre>
+set TARGET=x64
+set arch=x64
+or
+set TARGET=ARM64
+set arch=arm64
+</pre>
+
+</p>
+installer\release.bat を実行し、3を選択します。
+</p>
+
 <h3 id="build-detail">ビルド手順 (詳説)</h3>
 
 <h3 id="build-checkout">ソースコードの clone</h3>
