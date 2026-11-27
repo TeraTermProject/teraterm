@@ -443,14 +443,13 @@ static void OutputLogNewLine(vtterm_work_t *vtterm)
  *		出力先
  *			ログファイル
  *			macro送信バッファ(DDEPut1())
- *			プリント用
  */
 static void OutputLogUTF32(unsigned int u32)
 {
 	vtterm_work_t *vtterm;
 	CheckEOLRet r;
 
-	if (!FLogIsOpendText() && !DDELog && !PrinterMode) {
+	if (!FLogIsOpendText() && !DDELog) {
 		return;
 	}
 	vtterm = &vtterm_work;
@@ -480,20 +479,6 @@ static void OutputLogUTF32(unsigned int u32)
 		// u32を出力
 		if ((r & CheckEOLOutputChar) != 0) {
 			DDEPut1U32(u32);
-		}
-	}
-
-	// プリント
-	if (PrinterMode) {
-		if ((r & CheckEOLOutputEOL) != 0) {
-			// 改行を出力
-			WriteToPrnFile(PrintFile_, CR,TRUE);
-			WriteToPrnFile(PrintFile_, LF,TRUE);
-		}
-
-		// u32を出力
-		if ((r & CheckEOLOutputChar) != 0) {
-			WriteToPrnFileUTF32(PrintFile_, u32, TRUE);
 		}
 	}
 }
@@ -946,6 +931,13 @@ retry:
  */
 static void PutU32(unsigned int code)
 {
+	if (PrinterMode) {
+		// プリンタコントローラモード中はプリンタへのみ出力する
+		// (画面表示、ログ、マクロ送信は行わない)
+		WriteToPrnFileUTF32(PrintFile_, code, TRUE);
+		return;
+	}
+
 	PutU32NoLog(code);
 
 	// ログを出力
