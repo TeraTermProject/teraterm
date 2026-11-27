@@ -36,6 +36,128 @@
 
 #include "inifile_com.h"
 
+/*検証用*/
+static void dbg_printW(const wchar_t *appW, const wchar_t *keyW, const wchar_t *strW, wchar_t *s)
+{
+	wprintf_s(L"%-10s [%s] k=%s, v=%s\n", s,
+		appW==NULL?L"<NULL>":appW,
+		keyW==NULL?L"<NULL>":keyW,
+		strW==NULL?L"<NULL>":strW);
+}
+
+/**
+ *	書き込みが必要な時だけ、WritePrivateProfileStringW() を呼び出す
+ */
+BOOL WritePrivateProfileStringWifNeeded(const wchar_t *appW, const wchar_t *keyW, const wchar_t *strW, const wchar_t *filenameW)
+{
+	//キー削除・追加・更新以外の場合
+	if (NULL == appW || NULL == keyW || NULL == filenameW) {
+		return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+	}
+
+	//キー削除の場合
+	if (strW == NULL) {
+		wchar_t buf1W[2];
+		DWORD dwSize = GetPrivateProfileStringW(appW, keyW, L"", buf1W, _countof(buf1W), filenameW);
+		//strWはNULLかつファイルが無い場合は削除しない(キーがなくてもここに来るらしい)
+		if (0x02 == GetLastError()) {
+			return TRUE;
+		}
+		//strWはNULLかつiniキーなしの場合は書き込みしない
+		if (0 == dwSize) {
+			if (0 != GetPrivateProfileStringW(appW, keyW, L"*", buf1W, _countof(buf1W), filenameW)) {
+				return TRUE;
+			}
+		}
+		//strWはNULLかつiniキーありの場合は書き込む(キー削除)
+		return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+	}
+
+	//キー追加・更新の場合
+	else {
+		DWORD lenW_max = (DWORD)(wcslen(strW) + 2);
+		wchar_t *buf2W = (wchar_t *)malloc(sizeof(wchar_t) * lenW_max);
+#if 0
+		//初期バージョン("","*"で条件分岐)
+		DWORD dwSize = GetPrivateProfileStringW(appW, keyW, L"", buf2W, lenW_max, filenameW);
+		//ファイルが無い場合は書き込む(キーがなくてもここに来るらしい)
+		if (0x02 == GetLastError()) {
+			dbg_printW(appW, keyW, strW, L"5_NEW_FILE");
+			free(buf2W);
+			return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+		}
+		//iniキーなしの場合は書き込む
+		if (0 == dwSize) {
+			if (0 != GetPrivateProfileStringW(appW, keyW, L"*", buf2W, lenW_max, filenameW)) {
+				dbg_printW(appW, keyW, strW, L"6_ADD");
+				free(buf2W);
+				return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+			}
+		}
+		//strWとiniキーの値が同じ場合は書き込みしない
+		if (wcsncmp(strW, buf2W, lenW_max) == 0) {
+			//dbg_printW(appW, keyW, strW, L"7_EQUAL");
+			free(buf2W);
+			return TRUE;
+		}
+#endif
+#if 0
+		//int バージョン
+		GetPrivateProfileStringW(appW, keyW, L"", buf2W, lenW_max, filenameW);
+		int v1 = GetPrivateProfileIntW(appW, keyW, 1, filenameW);
+		int v2 = GetPrivateProfileIntW(appW, keyW, 2, filenameW);
+		if (v1 != v2) {
+			// ファイルなし・キーなし
+			// またはキーあって値がない ...
+			// GetPrivarteProfileStringを使えば判定できそうだが、このケースを分ける必要はない？
+			// 書き込む
+			dbg_printW(appW, keyW, strW, L"6_ADD");
+			//wprintf_s(L"%d,%d\n", v1, v2);
+			free(buf2W);
+			return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+		}
+		else if (wcsncmp(strW, buf2W, lenW_max) == 0) {
+			// strWとiniキーの値が同じ
+			// 書き込みしない
+			// dbg_printW(appW, keyW, strW, L"7_EQUAL");
+			free(buf2W);
+			return TRUE;
+		}
+		else {
+			// 異なるので書き込む
+		}
+#endif
+#if 1
+		//string バージョン
+		wchar_t *defW = L"{0E177175-4B1B-44DE-AB8B-33E41CDCC19C}";
+		GetPrivateProfileStringW(appW, keyW, defW, buf2W, lenW_max, filenameW);
+		if (wcsncmp(defW, buf2W, lenW_max) == 0) {
+			// ファイルなし・キーなし
+			// 書き込む
+			dbg_printW(appW, keyW, strW, L"6_ADD");
+			free(buf2W);
+			return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+		}
+		else if (wcsncmp(strW, buf2W, lenW_max) == 0) {
+			// strWとiniキーの値が同じ
+			// 書き込みしない
+			//dbg_printW(appW, keyW, strW, L"7_EQUAL");
+			free(buf2W);
+			return TRUE;
+		}
+		else {
+			// 異なるので書き込む
+		}
+#endif
+		free(buf2W);
+	}
+
+	dbg_printW(appW, keyW, strW, L"8_UPDATE");
+	return WritePrivateProfileStringW(appW, keyW, strW, filenameW);
+}
+
+#define WritePrivateProfileStringW(p1, p2, p3, p4) WritePrivateProfileStringWifNeeded(p1, p2, p3, p4)
+
 /**
  *	GetPrivateProfileStringA() のファイル名だけが wchar_t 版
  */
