@@ -1,73 +1,69 @@
-
 #
 # Export TeraTerm Menu registry to ini file.
-#   with ActivePerl
+#   with Strawberry Perl
 #
 # Usage:
 # c:\>perl ttpmenu.pl > ttpmenu.ini
 #
 
-use Win32::Registry;
 use strict;
+use warnings;
+use Win32::TieRegistry (':REG_', Delimiter => '/', ArrayValues => 1);
 
-my $TTMREG = "Software\\ShinpeiTools\\TTermMenu";
-my $tips;
-my $key;
-my @subkeys;
+my $TTMREG = 'HKEY_CURRENT_USER/Software/ShinpeiTools/TTermMenu';
+my $changed = 0;
 
-PrintSectionName("TTermMenu");
+PrintSectionName('TTermMenu');
 ExportIniFile($TTMREG);
 
-$HKEY_CURRENT_USER->Open($TTMREG, $tips) or die "Can not open registry";
-$tips->GetKeys(\@subkeys);
-$tips->Close();
-foreach $key (@subkeys) {
-#	print "$key\n";
-	PrintSectionName("$key");
-	ExportIniFile($TTMREG . "\\" . $key);
+my $root = $Registry->{$TTMREG} or die "Cannot open registry key: $TTMREG";
+
+foreach my $key (keys %$root) {
+    next unless $key =~ m!/$!;
+    PrintSectionName($key);
+    ExportIniFile($TTMREG . '/' . $key);
 }
 
+if ($changed == 1) {
+	print STDERR "; ']' has been removed. check the section name.\n";
+}
 
 exit(0);
 
-
 sub PrintSectionName {
-	my($name) = @_;
-	
-	# Get rid of bracket
-	$name =~ tr/[]//d;
-	print "[$name]\n";
-}
+    my ($name) = @_;
 
+    $name =~ s!/$!!;
+	if ($name =~ /\]/) {
+		my $org = $name;
+		# ] を削除。] 削除によりセクション名が重複する場合がある。
+		$name =~ s/\]//g;
+		print "[$name] ; <- [$org]\n";
+		$changed = 1;
+	} else {
+		print "[$name]\n";
+	}
+}
 
 sub ExportIniFile {
-	my($path) = @_;
-	my($tips);
-	my(%vals);
-	my($key, $RegType, $RegValue, $RegKey, @bytes);
+    my ($path) = @_;
 
-	$HKEY_CURRENT_USER->Open($path, $tips) or die "Can not open registry";
+    my $regkey = $Registry->{$path} or die "Cannot open registry key: $path";
 
-	$tips->GetValues(\%vals);
-	foreach $key (keys(%vals)) {
-		$RegType     = $vals{$key}->[1];
-		$RegValue     = $vals{$key}->[2];
-		$RegKey     = $vals{$key}->[0];
-		print "$RegKey=";
-		if ($RegType == REG_DWORD) {
-			printf "%08x\n", $RegValue;
-			
-		} elsif ($RegType == REG_BINARY) {
-			@bytes = unpack('C*', $RegValue);
-			printf "%02x ", $_ foreach @bytes;
-			print "\n";
-		
-		} else {
-			print "$RegValue\n";
-		}
-	}
-	print "\n";
-
-	$tips->Close();
+    foreach my $RegKey (keys %$regkey) {
+        next if $RegKey =~ m!/$!;
+        my ($RegValue, $RegType) = @{ $regkey->{$RegKey} };
+        $RegKey =~ s/^\///;
+        print "$RegKey=";
+        if ($RegType == REG_DWORD) {
+            printf "%d\n", unpack("l", pack("L", hex($RegValue)));
+        } elsif ($RegType == REG_BINARY) {
+            my @bytes = unpack('C*', $RegValue);
+            printf "%02X ", $_ foreach @bytes;
+            print "\n";
+        } else {
+            print "$RegValue\n";
+        }
+    }
+    print "\n";
 }
-
