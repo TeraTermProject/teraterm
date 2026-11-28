@@ -1237,6 +1237,7 @@ MSG_ERROR_MAKETTL=ttpmenu.TTLの作成に失敗しました。\n
 MSG_ERROR_LAUNCH=アプリケーションの実行に失敗しました。\n
 MSG_ERROR_NOREGNAME=登録名を入力して下さい。
 MSG_ERROR_INVALIDREGNAME=登録名に"\\"は使用できません。
+MSG_ERROR_INVALIDSECTIONNAME=登録名に"]"は使用できません。
 MSG_ERROR_NOHOST=ホスト名を入力して下さい。
 MSG_ERROR_NOMACRO=マクロファイル名を入力して下さい。
 MSG_ERROR_CHECKFILE=ファイル[%s]のチェックに失敗しました。\n
