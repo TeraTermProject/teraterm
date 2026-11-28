@@ -1206,58 +1206,97 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 	}
 }
 
-BOOL PrnOpen(PCHAR DevName)
+/**
+ *	プリンタ用に開いたシリアルポートを設定する
+ *
+ *	@param	h			開いたシリアルポートのハンドル
+ *	@param	DevName		デバイス名, BuildCommDCB() の書式
+ */
+static void PrnSetupSerial(HANDLE h, const wchar_t *DevName)
 {
-	char Temp[MAXPATHLEN], *c;
 	DCB dcb;
 	DWORD DErr;
 	COMMTIMEOUTS ctmo;
 
-	strncpy_s(Temp, sizeof(Temp),DevName, _TRUNCATE);
-	c = Temp;
-	while (*c != '\0' && *c != ':') {
-		c++;
+	if (GetCommState(h,&dcb)) {
+		// 9x でも動作するよう ANSI 版を使う
+		char *DevNameA = ToCharW(DevName);
+		BuildCommDCBA(DevNameA,&dcb);
+		free(DevNameA);
+		SetCommState(h,&dcb);
 	}
-	*c = '\0';
-	LPTFlag = (Temp[0]=='L') ||
-	          (Temp[0]=='l');
+	ClearCommError(h,&DErr,NULL);
+	SetupComm(h,0,CommOutQueSize);
+	/* flush output buffer */
+	PurgeComm(h, PURGE_TXABORT | PURGE_TXCLEAR);
+	memset(&ctmo,0,sizeof(ctmo));
+	ctmo.WriteTotalTimeoutConstant = 1000;
+	SetCommTimeouts(h,&ctmo);
+	EscapeCommFunction(h,SETDTR);
+}
+
+/**
+ *	プリンタポートを開く
+ *	PrnWrite() 出力
+ *	PrnClose() 終了
+ *
+ *	@param	DevName		デバイス名 (TERATERM.INI の PassThruPort)
+ *						例:
+ *							PassThruPort=LPT1
+ *							PassThruPort=COM2: 9600,n,8,1,x
+ *	@retval	ERROR_SUCCESS	開けた
+ *	@retval	その他			開けなかった(Win32エラーコード)
+ */
+DWORD PrnOpen(const wchar_t *DevName)
+{
+	DWORD err = ERROR_SUCCESS;
+	wchar_t *temp = _wcsdup(DevName);
+	wchar_t *c;
+
+	if (temp == NULL) {
+		return ERROR_NOT_ENOUGH_MEMORY;
+	}
+	// "LPT1:" -> "LPT"
+	c = wcschr(temp, L':');
+	if (c != NULL) {
+		*c = L'\0';
+	}
+
+	// "LPT" で始まるとき(大文字小文字は区別しない)はプリンタポート
+	LPTFlag = (_wcsnicmp(temp, L"LPT", 3) == 0);
 
 	if (IsWindowsNTKernel()) {
 		// ネットワーク共有にマップされたデバイスが相手の場合、こうしないといけないらしい (2011.01.25 maya)
 		// http://logmett.com/forum/viewtopic.php?f=2&t=1383
 		// http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx#5
-		PrnID = CreateFile(Temp,GENERIC_WRITE | FILE_READ_ATTRIBUTES,
-		                   FILE_SHARE_READ,NULL,CREATE_ALWAYS,
-		                   0,NULL);
+		PrnID = CreateFileW(temp,GENERIC_WRITE | FILE_READ_ATTRIBUTES,
+							FILE_SHARE_READ,NULL,CREATE_ALWAYS,
+							0,NULL);
+		if (PrnID == INVALID_HANDLE_VALUE) {
+			err = GetLastError();
+		}
 	}
 	else {
 		// 9x では上記のコードでうまくいかないので従来通りの処理
-		PrnID = CreateFile(Temp,GENERIC_WRITE,
-		                   0,NULL,OPEN_EXISTING,
-		                   0,NULL);
+		char *tempA = ToCharW(temp);
+		PrnID = CreateFileA(tempA,GENERIC_WRITE,
+							0,NULL,OPEN_EXISTING,
+							0,NULL);
+		if (PrnID == INVALID_HANDLE_VALUE) {
+			err = GetLastError();
+		}
+		free(tempA);
 	}
+	free(temp);
 
 	if (PrnID == INVALID_HANDLE_VALUE) {
-		return FALSE;
+		return err;
 	}
 
-	if (GetCommState(PrnID,&dcb)) {
-		BuildCommDCB(DevName,&dcb);
-		SetCommState(PrnID,&dcb);
-	}
-	ClearCommError(PrnID,&DErr,NULL);
 	if (! LPTFlag) {
-		SetupComm(PrnID,0,CommOutQueSize);
+		PrnSetupSerial(PrnID, DevName);
 	}
-	/* flush output buffer */
-	PurgeComm(PrnID, PURGE_TXABORT | PURGE_TXCLEAR);
-	memset(&ctmo,0,sizeof(ctmo));
-	ctmo.WriteTotalTimeoutConstant = 1000;
-	SetCommTimeouts(PrnID,&ctmo);
-	if (! LPTFlag) {
-		EscapeCommFunction(PrnID,SETDTR);
-	}
-	return TRUE;
+	return ERROR_SUCCESS;
 }
 
 int PrnWrite(PCHAR b, int c)

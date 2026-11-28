@@ -43,7 +43,7 @@ void CommSend(PComVar cv);
 void CommSendBreak(PComVar cv, int msec);
 void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuffer);
 void CommLock(PTTSet ts, PComVar cv, BOOL Lock);
-BOOL PrnOpen(PCHAR DevName);
+DWORD PrnOpen(const wchar_t *DevName);
 int PrnWrite(PCHAR b, int c);
 void PrnCancel();
 void PrnClose();

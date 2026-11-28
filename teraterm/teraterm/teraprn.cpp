@@ -402,19 +402,36 @@ static void PrintFile_(PrintFile *handle)
 	handle->FinishCallback(handle);
 }
 
-static void PrintFileDirect(PrintFile *handle)
+/**
+ *	プリンタポート(ts.PrnDev)へ直接出力する印字を開始する
+ *
+ *	@retval	ERROR_SUCCESS	エラーなし
+ *	@retval	その他			プリンタポートを開けなかった(Win32エラーコード)
+ *							印字は中断される
+ */
+static DWORD PrintFileDirect(PrintFile *handle)
 {
 	if (PrnCreateDialog() == FALSE) {
 		DeletePrintFile(handle);
-		return;
+		return ERROR_SUCCESS;
 	}
 
+	DWORD err = ERROR_SUCCESS;
 	handle->HPrnFile = CreateFileW(handle->PrnFName,
 									GENERIC_READ, FILE_SHARE_READ, NULL,
 									OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	PrintAbortFlag = (handle->HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);
 	handle->PrnBuffCount = 0;
+	PrintAbortFlag = TRUE;
+	if (handle->HPrnFile != INVALID_HANDLE_VALUE) {
+		wchar_t *dev = ToWcharA(ts.PrnDev);
+		err = PrnOpen(dev);
+		free(dev);
+		if (err == ERROR_SUCCESS) {
+			PrintAbortFlag = FALSE;
+		}
+	}
 	SetTimer(HVTWin,IdPrnProcTimer,0,NULL);
+	return err;
 }
 
 void PrnFileDirectProc(PrintFile *handle)
@@ -466,20 +483,26 @@ void PrnFileDirectProc(PrintFile *handle)
 /**
  * タイマー時間が経過、印字を開始する
  *		ClosePrnFile() の SetTimer(IdPrnStartTimer) がトリガ
+ *
+ *	@retval	ERROR_SUCCESS	エラーなし
+ *	@retval	その他			プリンタポートを開けなかった(Win32エラーコード)
+ *							PrnOpenErrorMessage() で表示できる
  */
-void PrnFileStart(PrintFile *handle)
+DWORD PrnFileStart(PrintFile *handle)
 {
 	if (handle->HPrnFile != INVALID_HANDLE_VALUE) {
-		return;
+		return ERROR_SUCCESS;
 	}
 	if (handle->PrnFName == NULL) {
-		return;
+		return ERROR_SUCCESS;
 	}
 	if (ts.PrnDev[0]!=0) {
-		PrintFileDirect(handle); // send file directry to printer port
+		// send file directry to printer port
+		return PrintFileDirect(handle);
 	}
 	else { // print file by using Windows API
 		PrintFile_(handle);
+		return ERROR_SUCCESS;
 	}
 }
 

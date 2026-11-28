@@ -36,7 +36,7 @@ typedef struct PrintFileTag PrintFile;
 
 PrintFile *OpenPrnFile(void);
 void PrnFileDirectProc(PrintFile *handle);
-void PrnFileStart(PrintFile *handle);
+DWORD PrnFileStart(PrintFile *handle);
 void ClosePrnFile(PrintFile *handle, void (*finish_callback)(PrintFile *handle));
 void WriteToPrnFileUTF32(PrintFile *handle, unsigned int u32, BOOL Write);
 void WriteToPrnFile(PrintFile *handle, BYTE b, BOOL Write);

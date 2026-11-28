@@ -3015,6 +3015,43 @@ void CVTWindow::OnSysKeyUp(WPARAM nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
+/**
+ *	プリンタポート(ts.PrnDev)を開けなかったことをメッセージボックスで表示する
+ *
+ *	@param	err		PrnFileStart() の戻り値(Win32エラーコード)
+ */
+static void PrnOpenErrorMessage(DWORD err)
+{
+	static const TTMessageBoxInfoW info = {
+		"Tera Term",
+		"MSG_TT_ERROR", L"Tera Term: Error",
+		NULL, NULL,
+		MB_TASKMODAL | MB_ICONEXCLAMATION
+	};
+	const char *key;
+	const wchar_t *def;
+	switch (err) {
+	case ERROR_FILE_NOT_FOUND:
+		key = "MSG_CANTOPEN_ERROR_NOTFOUND";
+		def = L"Cannot open %s. Not found.";
+		break;
+	case ERROR_ACCESS_DENIED:
+		key = "MSG_CANTOPEN_ERROR_DENIED";
+		def = L"Cannot open %s. Access denied.";
+		break;
+	default:
+		key = "MSG_CANTOPEN_ERROR";
+		def = L"Cannot open %s. (0x%08x)";
+		break;
+	}
+	wchar_t *format = TTGetLangStrW("Tera Term", key, def,
+									ts.UILanguageFileW);
+	wchar_t *dev = ToWcharA(ts.PrnDev);
+	TTMessageBoxW(HVTWin, &info, ts.UILanguageFileW, format, dev, err);
+	free(dev);
+	free(format);
+}
+
 void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	POINT Point;
@@ -3096,9 +3133,13 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 			break;
-		case IdPrnStartTimer:
-			PrnFileStart(PrintFile_);
+		case IdPrnStartTimer: {
+			DWORD err = PrnFileStart(PrintFile_);
+			if (err != ERROR_SUCCESS) {
+				PrnOpenErrorMessage(err);
+			}
 			break;
+		}
 		case IdPrnProcTimer:
 			PrnFileDirectProc(PrintFile_);
 			break;
